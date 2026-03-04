@@ -1,0 +1,236 @@
+---
+// Skills.astro – Skills con logos SVG + puntuaciones 1-10
+const groups = [
+  {
+    name: 'Frontend',
+    skills: [
+      { name: 'HTML / CSS',    level: 10, id: 'html'     },
+      { name: 'JavaScript',   level: 9,  id: 'js'       },
+      { name: 'TypeScript',   level: 9,  id: 'ts'       },
+      { name: 'Tailwind CSS', level: 9,  id: 'tailwind' },
+    ],
+  },
+  {
+    name: 'Diseño & UX',
+    skills: [
+      { name: 'Animaciones',   level: 8, id: 'anim'      },
+      { name: 'Accesibilidad', level: 7, id: 'a11y'      },
+      { name: 'Responsive',    level: 9, id: 'responsive' },
+    ],
+  },
+  {
+    name: 'Backend',
+    skills: [
+      { name: 'Node.js',        level: 8, id: 'node'     },
+      { name: 'REST / GraphQL', level: 8, id: 'api'      },
+      { name: 'PostgreSQL',     level: 7, id: 'postgres' },
+    ],
+  },
+  {
+    name: 'Herramientas',
+    skills: [
+      { name: 'Git / GitHub',   level: 9, id: 'git'     },
+      { name: 'Vite / Webpack', level: 8, id: 'vite'    },
+      { name: 'CI/CD',          level: 7, id: 'cicd'    },
+      { name: 'Testing',        level: 7, id: 'testing' },
+    ],
+  },
+];
+
+// Logos SVG por ID de tecnología
+const logos: Record<string, string> = {
+  html: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M4 2l1.6 18L12 22l6.4-2L20 2H4z" fill="#E44D26"/>
+    <path d="M12 20.5l5.2-1.44 1.37-15.34H12V20.5z" fill="#F16529"/>
+    <path d="M8.5 8.5h7l-.3 3-3.2.8-3.2-.8-.2-2H7l.4 4.5L12 15l4.6-1 .6-6.5H8.5z" fill="#fff"/>
+  </svg>`,
+
+  js: `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <rect width="24" height="24" rx="2" fill="#F7DF1E"/>
+    <text x="4.5" y="19" font-family="monospace" fill="#222" font-size="10" font-weight="bold">JS</text>
+  </svg>`,
+
+  ts: `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <rect width="24" height="24" rx="2" fill="#3178C6"/>
+    <text x="4" y="19" font-family="monospace" fill="#fff" font-size="10" font-weight="bold">TS</text>
+  </svg>`,
+
+  tailwind: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M6.5 9.5C7.5 6 9.5 5.5 11 8c1.5 2.5 2.5 3.5 4.5 1" stroke="#38BDF8" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="M6.5 14.5C7.5 11 9.5 10.5 11 13c1.5 2.5 2.5 3.5 4.5 1" stroke="#38BDF8" stroke-width="2.2" stroke-linecap="round"/>
+  </svg>`,
+
+  anim: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M12 2l2 5h5l-4 3 1.5 5L12 12l-4.5 3L9 10 5 7h5l2-5z" fill="currentColor" opacity="0.85"/>
+    <circle cx="4.5" cy="20" r="1.2" fill="currentColor" opacity="0.4"/>
+    <circle cx="19.5" cy="20" r="1.2" fill="currentColor" opacity="0.4"/>
+    <circle cx="12" cy="22" r="1.2" fill="currentColor" opacity="0.4"/>
+  </svg>`,
+
+  a11y: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="12" cy="4" r="2" fill="currentColor"/>
+    <path d="M5 9h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    <path d="M12 9v7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    <path d="M8 22l2.5-4M16 22l-2.5-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+  </svg>`,
+
+  responsive: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="2" y="5" width="14" height="10" rx="1.5" stroke="currentColor" stroke-width="1.7"/>
+    <path d="M9 17h4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+    <rect x="17" y="8" width="5.5" height="8.5" rx="1" stroke="currentColor" stroke-width="1.5"/>
+    <circle cx="19.75" cy="18" r="0.6" fill="currentColor"/>
+  </svg>`,
+
+  node: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M12 2L21.5 7.5v9L12 22 2.5 16.5v-9L12 2z" fill="#539E43"/>
+    <path d="M12 2L21.5 7.5v9L12 22V2z" fill="#3d7a32"/>
+    <text x="12" y="15" text-anchor="middle" font-family="monospace" fill="#fff" font-size="5" font-weight="bold">NODE</text>
+  </svg>`,
+
+  api: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="5" cy="12" r="2.5" stroke="currentColor" stroke-width="1.5"/>
+    <circle cx="19" cy="7" r="2.5" stroke="currentColor" stroke-width="1.5"/>
+    <circle cx="19" cy="17" r="2.5" stroke="currentColor" stroke-width="1.5"/>
+    <path d="M7.5 11.2L16.5 7.8M7.5 12.8L16.5 16.2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+  </svg>`,
+
+  postgres: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="12" cy="7" rx="6.5" ry="2.5" stroke="#336791" stroke-width="1.7"/>
+    <path d="M5.5 7v10c0 1.4 2.9 2.5 6.5 2.5s6.5-1.1 6.5-2.5V7" stroke="#336791" stroke-width="1.7"/>
+    <path d="M5.5 12c0 1.4 2.9 2.5 6.5 2.5s6.5-1.1 6.5-2.5" stroke="#336791" stroke-width="1.3" stroke-dasharray="2.5 1.5"/>
+  </svg>`,
+
+  git: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="5.5" cy="18.5" r="2" stroke="#F05032" stroke-width="1.7"/>
+    <circle cx="18.5" cy="5.5" r="2" stroke="#F05032" stroke-width="1.7"/>
+    <circle cx="18.5" cy="14" r="2" stroke="#F05032" stroke-width="1.7"/>
+    <path d="M7.5 18H14c1.2 0 2.5-1 2.5-2.3V7.5" stroke="#F05032" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M5.5 16.5v-5.8C5.5 9.3 6.8 8 8 8h8.5" stroke="#F05032" stroke-width="1.5" stroke-linecap="round"/>
+  </svg>`,
+
+  vite: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M21 3L12.5 19.5 10 14l-8 2L14.5 3 17 9l4-6z" fill="#646CFF"/>
+    <path d="M10 14l2.5 5.5-8-15.5 5.5 10z" fill="#FFBD2E"/>
+  </svg>`,
+
+  cicd: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M12 4a8 8 0 0 1 7.2 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+    <path d="M4.8 15.5A8 8 0 0 0 19.8 13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="3 2"/>
+    <path d="M19.5 4.5l-.3 4-3.5-1.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M4.5 19.5l.3-4 3.5 1.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>`,
+
+  testing: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M9 3h6l1.5 8H7.5L9 3z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+    <path d="M7.5 11c-2.5 2.5-4 5.5-4 7a8.5 8.5 0 0 0 17 0c0-1.5-1.5-4.5-4-7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+    <circle cx="10" cy="16.5" r="1.3" fill="currentColor" opacity="0.5"/>
+    <circle cx="14" cy="14.5" r="1" fill="currentColor" opacity="0.4"/>
+  </svg>`,
+};
+
+// Lista plana de todos los skills para la leyenda
+const allSkills = groups.flatMap(g => g.skills);
+---
+
+<section id="skills" class="section" aria-label="Habilidades">
+  <span class="section-label">Skills</span>
+  <h2 class="section-title reveal">Tecnologías &amp; herramientas</h2>
+
+  <div class="skills-groups">
+    {groups.map((g) => (
+      <div class="skill-group reveal">
+        <div class="skill-group-title">{g.name}</div>
+        <!-- Hint: fades out once the card is activated -->
+        <p class="skill-hint" aria-hidden="true">
+          <span class="skill-hint-desktop">Pasa el ratón para ver</span>
+          <span class="skill-hint-mobile">Toca la tarjeta para ver</span>
+        </p>
+        <ul class="skill-list" role="list">
+          {g.skills.map((s) => (
+            <li class="skill-item">
+              <span class="skill-icon" aria-label={s.name} title={s.name}
+                set:html={logos[s.id] ?? ''} />
+              <div class="skill-dots" aria-label={`${s.name}: ${s.level} de 10`}>
+                {Array.from({length: 10}, (_, i) => (
+                  <span
+                    class={`skill-dot${i < s.level ? ' filled' : ''}`}
+                    style={i < s.level ? `--di:${i * 0.06}s` : ''}
+                  ></span>
+                ))}
+              </div>
+              <span class="skill-score">
+                {s.level}<span class="skill-score-max">/10</span>
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    ))}
+  </div>
+
+  <!-- Leyenda colapsable: botón "Ver leyenda" --> 
+  <div class="skills-legend reveal">
+    <button class="legend-toggle" id="legendToggle" aria-expanded="false" aria-controls="legendGrid">
+      <svg class="legend-chevron" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+        <path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Ver leyenda
+    </button>
+    <div class="skills-legend-grid" id="legendGrid" aria-hidden="true">
+      {allSkills.map((s) => (
+        <span class="legend-item">
+          <span set:html={logos[s.id] ?? ''} />
+          {s.name}
+        </span>
+      ))}
+    </div>
+  </div>
+</section>
+
+<script>
+  const btn  = document.getElementById('legendToggle') as HTMLButtonElement;
+  const grid = document.getElementById('legendGrid')   as HTMLElement;
+
+  btn.addEventListener('click', () => {
+    const open = btn.getAttribute('aria-expanded') === 'true';
+    btn.setAttribute('aria-expanded', String(!open));
+    grid.setAttribute('aria-hidden', String(open));
+    btn.classList.toggle('is-open', !open);
+  });
+</script>
+
+<script>
+  const groups = document.querySelectorAll<HTMLElement>('.skill-group');
+
+  // IntersectionObserver: only marks visible (for other reveal animations, NOT for dots)
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    },
+    { threshold: 0.2 }
+  );
+
+  groups.forEach((group) => {
+    observer.observe(group);
+
+    // Desktop: hover reveals dots
+    group.addEventListener('mouseenter', () => group.classList.add('active'));
+    group.addEventListener('mouseleave', () => group.classList.remove('active'));
+
+    // Mobile: tap toggles dots — only if touch didn't scroll
+    let touchStartY = 0;
+    group.addEventListener('touchstart', (e) => {
+      touchStartY = e.touches[0].clientY;
+    }, { passive: true });
+
+    group.addEventListener('touchend', (e) => {
+      const delta = Math.abs(e.changedTouches[0].clientY - touchStartY);
+      if (delta < 10) group.classList.toggle('active'); // tap, not scroll
+    }, { passive: true });
+  });
+</script>

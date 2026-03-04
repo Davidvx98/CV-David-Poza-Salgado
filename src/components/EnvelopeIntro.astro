@@ -1,0 +1,330 @@
+---
+// EnvelopeIntro.astro – Secuencia: sobre cerrado → flap abre → 1s pausa → carta sube → sobre desaparece
+---
+
+<!--
+  ESTRUCTURA SEPARADA:
+  · #intro-overlay  → fondo + envelope (sólo la carcasa del sobre)
+  · .envelope-seal  → sello, dentro del overlay pero fuera del envelope-wrap (z máximo)
+  · .inner-card     → tarjeta, position:fixed, independiente del sobre
+  · .skip-btn       → botón fijo siempre visible
+-->
+
+<!-- Overlay de fondo con el sobre -->
+<div id="intro-overlay">
+
+  <!-- Envelope: SÓLO la estructura visual (sin la tarjeta dentro) -->
+  <div class="envelope-wrap" id="envelope">
+    <!-- Panel sólido base -->
+    <div class="envelope-body" aria-hidden="true"></div>
+    <!-- Pliegues decorativos -->
+    <div class="env-fold-bottom" aria-hidden="true"></div>
+    <div class="env-fold-left"   aria-hidden="true"></div>
+    <div class="env-fold-right"  aria-hidden="true"></div>
+    <div class="env-fold-top"    aria-hidden="true"></div>
+    <!-- Solapa -->
+    <div class="envelope-flap" id="flap">
+      <div class="envelope-flap-face"></div>
+    </div>
+
+    <!-- Sello de lacre: estrella que desaparece al hacer click -->
+    <div class="envelope-seal" id="envelope-seal" aria-hidden="true">
+      <svg viewBox="0 0 80 80" width="64" height="64" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Disco de fondo -->
+        <circle cx="40" cy="40" r="34" fill="#cc1b1b" opacity="0.22"/>
+        <circle cx="40" cy="40" r="28" fill="#cc1b1b" opacity="0.30"/>
+        <!-- Estrella de 8 puntas -->
+        <path d="M40 8 L43.5 30 L64 18 L50 36 L72 40 L50 44 L64 62 L43.5 50 L40 72 L36.5 50 L16 62 L30 44 L8 40 L30 36 L16 18 L36.5 30 Z"
+              fill="#e02020" opacity="0.95"/>
+        <!-- Anillo exterior -->
+        <circle cx="40" cy="40" r="34" stroke="#e02020" stroke-width="1.4" opacity="0.6"/>
+        <!-- Letra central -->
+        <text x="40" y="46" text-anchor="middle" font-family="serif" font-size="18"
+              font-weight="700" fill="#fff" opacity="0.95">D</text>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Click hint debajo del sobre -->
+  <p class="click-hint" id="click-hint">Haz click para abrir</p>
+
+</div>
+
+<!--
+  Tarjeta: position:fixed, COMPLETAMENTE independiente del sobre.
+  Empieza solapada visualmente con el sobre, luego sube al centro-inferior.
+-->
+<div class="inner-card" id="inner-card" aria-live="polite">
+  <span class="inner-card-label">Para ti</span>
+  <p>
+    <strong>Bienvenido al perfil de David&nbsp;Poza,</strong>
+    Web Developer especializado en experiencias web rápidas, limpias y bien diseñadas.
+  </p>
+
+  <!-- Advertencia fotosensibilidad -->
+  <div class="epilepsy-warning" id="epilepsy-warning">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M12 3L2 21h20L12 3z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+      <line x1="12" y1="10" x2="12" y2="14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      <circle cx="12" cy="18" r="1.2" fill="currentColor"/>
+    </svg>
+    <p>Esta web usa <strong>destellos de luz</strong> al entrar. Si tienes fotosensibilidad epileptica, desactivalos:</p>
+    <div class="anim-toggle-group" role="group" aria-label="Destello de luz al entrar">
+      <div class="anim-indicator" id="flash-indicator"></div>
+      <button class="anim-btn" id="flash-btn-on"  aria-pressed="true">Flash ON</button>
+      <button class="anim-btn" id="flash-btn-off" aria-pressed="false">Flash OFF</button>
+    </div>
+  </div>
+
+  <button class="btn-enter" id="enter-btn" aria-label="Entrar al portfolio">
+    Entrar al perfil
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+      <path d="M2 6h8M7 3l3 3-3 3" stroke="currentColor" stroke-width="1.5"
+        stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+</div>
+
+<!-- Skip: botón fixed siempre visible -->
+<button class="skip-btn" id="skip-btn" aria-label="Saltar introducción">Saltar intro</button>
+
+<!-- Línea de construcción: barre la pantalla de arriba abajo al entrar -->
+<div id="build-scan" aria-hidden="true"></div>
+
+<!-- Flash de rayo -->
+<div id="lightning-flash" aria-hidden="true"></div>
+
+<script>
+  const overlay   = document.getElementById('intro-overlay')!;
+  const envelope  = document.getElementById('envelope')!;
+  const seal      = document.getElementById('envelope-seal')!;
+  const clickHint = document.getElementById('click-hint')!;
+  const card      = document.getElementById('inner-card')!;
+  const enterBtn  = document.getElementById('enter-btn')!;
+  const skipBtn   = document.getElementById('skip-btn')!;
+  const flash     = document.getElementById('lightning-flash')!;
+
+  let opened = false;
+
+  // ── Si la animación está desactivada por el toggle, saltar directamente
+  if (localStorage.getItem('intro-disabled') === '1') {
+    overlay.remove();
+    card.remove();
+    skipBtn.remove();
+    document.body.classList.add('is-built');
+    window.dispatchEvent(new CustomEvent('portfolioEntered'));
+    document.body.style.overflow = '';
+  }
+
+  // ── Abrir sobre al hacer click
+  envelope.addEventListener('click', openEnvelope);
+
+  function openEnvelope() {
+    if (opened) return;
+    opened = true;
+
+    clickHint.classList.add('hidden');
+
+    // 1. El sello de lacre se escala y desvanece
+    seal.classList.add('seal-break');
+
+    // 2. A los 150ms el flap desaparece (fade+sube)
+    setTimeout(() => {
+      envelope.classList.add('open');
+    }, 150);
+
+    // 3. A los 500ms lanzar la tarjeta
+    setTimeout(launchCard, 500);
+  }
+
+  function launchCard() {
+    // ── La tarjeta sube desde el sobre hasta el centro de la pantalla
+    card.classList.add('card-visible');
+
+    // ── El sobre se desvanece mientras la tarjeta sube
+    // El fondo negro (#intro-overlay) SE QUEDA hasta que el usuario pulse el botón
+    const envWrap = document.getElementById('envelope')!;
+    envWrap.style.transition    = 'opacity 0.6s ease';
+    envWrap.style.opacity       = '0';
+    envWrap.style.pointerEvents = 'none';
+
+    setTimeout(() => { envWrap.remove(); }, 700);
+  }
+
+  // ── Flash (destello de luz) toggle
+  const flashBtnOn     = document.getElementById('flash-btn-on')!  as HTMLButtonElement;
+  const flashBtnOff    = document.getElementById('flash-btn-off')! as HTMLButtonElement;
+  const flashIndicator = document.getElementById('flash-indicator')!;
+
+  function isFlashEnabled(): boolean {
+    return localStorage.getItem('flash-disabled') !== '1';
+  }
+
+  function syncFlashToggle(enabled: boolean) {
+    flashBtnOn.classList.toggle('active',  enabled);
+    flashBtnOff.classList.toggle('active', !enabled);
+    flashBtnOn.setAttribute('aria-pressed',  String(enabled));
+    flashBtnOff.setAttribute('aria-pressed', String(!enabled));
+    flashIndicator.classList.toggle('at-off', !enabled);
+  }
+
+  syncFlashToggle(isFlashEnabled());
+
+  flashBtnOn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    localStorage.setItem('flash-disabled', '0');
+    syncFlashToggle(true);
+  });
+
+  flashBtnOff.addEventListener('click', (e) => {
+    e.stopPropagation();
+    localStorage.setItem('flash-disabled', '1');
+    syncFlashToggle(false);
+  });
+
+  // ── Cámara analógica: FASE 1 (disparo del obturador) ── juega con el flash
+  function playShutterSound() {
+    const actx = new AudioContext();
+    const t = actx.currentTime;
+
+    // Golpe grave del espejo
+    const mirrorOsc = actx.createOscillator();
+    mirrorOsc.type = 'sine';
+    mirrorOsc.frequency.setValueAtTime(130, t);
+    mirrorOsc.frequency.exponentialRampToValueAtTime(45, t + 0.055);
+    const mirrorGain = actx.createGain();
+    mirrorGain.gain.setValueAtTime(0.7, t);
+    mirrorGain.gain.exponentialRampToValueAtTime(0.001, t + 0.06);
+    mirrorOsc.connect(mirrorGain); mirrorGain.connect(actx.destination);
+    mirrorOsc.start(t); mirrorOsc.stop(t + 0.07);
+
+    function noiseBurst(startT: number, dur: number, freq: number, q: number, peak: number) {
+      const len = Math.ceil(actx.sampleRate * dur);
+      const buf = actx.createBuffer(1, len, actx.sampleRate);
+      const d   = buf.getChannelData(0);
+      for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+      const src = actx.createBufferSource(); src.buffer = buf;
+      const flt = actx.createBiquadFilter(); flt.type = 'bandpass';
+      flt.frequency.value = freq; flt.Q.value = q;
+      const g = actx.createGain();
+      g.gain.setValueAtTime(0, startT);
+      g.gain.linearRampToValueAtTime(peak, startT + 0.003);
+      g.gain.exponentialRampToValueAtTime(0.001, startT + dur);
+      src.connect(flt); flt.connect(g); g.connect(actx.destination);
+      src.start(startT); src.stop(startT + dur);
+    }
+    noiseBurst(t,        0.075,  950, 1.8, 0.45);
+    noiseBurst(t + 0.03, 0.055, 1800, 1.4, 0.22);
+    noiseBurst(t + 0.06, 0.030, 3200, 2.0, 0.10);
+    setTimeout(() => actx.close(), 250);
+  }
+
+  // ── Cámara analógica: FASE 2 (expulsión de la foto) ── sincronizada con build-scan
+  function playEjectSound() {
+    const actx = new AudioContext();
+    const t = actx.currentTime;
+    const dur = 0.55;
+
+    function noiseBurst(startT: number, d: number, freq: number, q: number, peak: number) {
+      const len = Math.ceil(actx.sampleRate * d);
+      const buf = actx.createBuffer(1, len, actx.sampleRate);
+      const data = buf.getChannelData(0);
+      for (let i = 0; i < len; i++) data[i] = Math.random() * 2 - 1;
+      const src = actx.createBufferSource(); src.buffer = buf;
+      const flt = actx.createBiquadFilter(); flt.type = 'bandpass';
+      flt.frequency.value = freq; flt.Q.value = q;
+      const g = actx.createGain();
+      g.gain.setValueAtTime(0, startT);
+      g.gain.linearRampToValueAtTime(peak, startT + 0.003);
+      g.gain.exponentialRampToValueAtTime(0.001, startT + d);
+      src.connect(flt); flt.connect(g); g.connect(actx.destination);
+      src.start(startT); src.stop(startT + d);
+    }
+
+    const motor = actx.createOscillator();
+    motor.type = 'sawtooth';
+    motor.frequency.setValueAtTime(72, t);
+    motor.frequency.setValueAtTime(68, t + 0.10);
+    motor.frequency.setValueAtTime(74, t + 0.25);
+    motor.frequency.setValueAtTime(70, t + 0.40);
+    motor.frequency.exponentialRampToValueAtTime(55, t + dur);
+
+    const lfo = actx.createOscillator();
+    lfo.type = 'sine'; lfo.frequency.value = 18;
+    const lfoGain = actx.createGain(); lfoGain.gain.value = 0.28;
+    lfo.connect(lfoGain);
+
+    const motorGain = actx.createGain();
+    motorGain.gain.setValueAtTime(0, t);
+    motorGain.gain.linearRampToValueAtTime(0.18, t + 0.025);
+    motorGain.gain.setValueAtTime(0.18, t + dur - 0.08);
+    motorGain.gain.exponentialRampToValueAtTime(0.001, t + dur);
+    lfoGain.connect(motorGain.gain);
+
+    const motorFilter = actx.createBiquadFilter();
+    motorFilter.type = 'lowpass'; motorFilter.frequency.value = 320;
+    motor.connect(motorFilter); motorFilter.connect(motorGain); motorGain.connect(actx.destination);
+    motor.start(t); motor.stop(t + dur);
+    lfo.start(t);   lfo.stop(t + dur);
+
+    noiseBurst(t,            dur * 0.85, 2800, 3.5, 0.04);
+    noiseBurst(t + dur - 0.06, 0.06,     400,  1.2, 0.12);
+    setTimeout(() => actx.close(), Math.ceil((dur + 0.15) * 1000));
+  }
+
+  // ── Entrar al portfolio: flash radial + desvanecimiento
+  function enterPortfolio() {
+    if (localStorage.getItem('flash-disabled') !== '1') {
+      playShutterSound();
+      flash.style.background = 'radial-gradient(circle at 50% 50%, #ffffff 0%, rgba(255,255,255,0.55) 40%, transparent 70%)';
+      flash.style.transform  = 'scale(0.15)';
+      flash.style.opacity    = '0';
+      flash.style.transition = 'none';
+      // fuerza reflow
+      flash.getBoundingClientRect();
+      flash.style.transition = 'opacity 0.14s ease-out, transform 0.55s ease-out';
+      flash.style.transform  = 'scale(1.08)';
+      flash.style.opacity    = '1';
+      setTimeout(() => {
+        flash.style.transition = 'opacity 0.55s ease-out';
+        flash.style.opacity    = '0';
+      }, 140);
+    }
+
+    // Desvanecer el fondo negro (overlay) + la tarjeta
+    setTimeout(() => {
+      overlay.style.transition    = 'opacity 0.5s ease';
+      overlay.style.opacity       = '0';
+      card.style.transition       = 'opacity 0.5s ease';
+      card.style.opacity          = '0';
+    }, 300);
+
+    setTimeout(() => {
+      overlay.remove();
+      card.remove();
+      flash.remove();
+      document.getElementById('skip-btn')?.remove();
+      document.body.classList.add('is-built');
+      // Avisar al resto de scripts que el portfolio ya está visible
+      window.dispatchEvent(new CustomEvent('portfolioEntered'));
+      // Sonido de expulsión sincronizado con el barrido del build-scan (delay 50ms)
+      if (localStorage.getItem('flash-disabled') !== '1') {
+        setTimeout(() => playEjectSound(), 50);
+      }
+      document.body.style.overflow = '';
+    }, 900);
+  }
+
+  enterBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    enterPortfolio();
+  });
+
+  skipBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    enterPortfolio();
+  });
+
+  // Prevent scroll while intro is active
+  document.body.style.overflow = 'hidden';
+</script>

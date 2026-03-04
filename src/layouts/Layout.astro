@@ -1,0 +1,116 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  url?: string;
+}
+
+const SITE = 'https://davidpozasalgado.dev';
+
+const {
+  title       = 'David Poza — Web Developer & UI Friendly',
+  description = 'Portfolio of David Poza, Web Developer specialised in fast, clean and visually striking web experiences. Available for freelance projects and full-time positions.',
+  image       = `${SITE}/img/foto_cara.jpeg`,  // TODO: replace with a proper 1200×630 OG banner
+  url         = SITE,
+} = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, SITE).href;
+
+// JSON-LD: Person schema
+const personSchema = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: 'David Poza',
+  url: SITE,
+  image: `${SITE}/og-image.png`,
+  jobTitle: 'Web Developer',
+  sameAs: [
+    'https://www.linkedin.com/in/david-poza-salgado/',
+    'https://github.com/Davidvx98',
+  ],
+  knowsAbout: ['Web Development', 'Frontend', 'UI Design', 'JavaScript', 'TypeScript', 'Astro'],
+});
+
+// JSON-LD: WebSite schema
+const websiteSchema = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'David Poza — Portfolio',
+  url: SITE,
+});
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- ─── Primary SEO ─── -->
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="keywords" content="David Poza, web developer, frontend developer, UI developer, portfolio, JavaScript, TypeScript, Astro, React, freelance" />
+    <meta name="author" content="David Poza" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href={canonicalURL} />
+
+    <!-- ─── Open Graph (Facebook / LinkedIn / WhatsApp) ─── -->
+    <meta property="og:type"        content="website" />
+    <meta property="og:site_name"   content="David Poza Portfolio" />
+    <meta property="og:url"         content={canonicalURL} />
+    <meta property="og:title"       content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image"       content={image} />
+    <meta property="og:image:width"  content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt"   content="David Poza — Web Developer portfolio preview" />
+    <meta property="og:locale"      content="en_US" />
+
+    <!-- ─── Twitter / X Card ─── -->
+    <meta name="twitter:card"        content="summary_large_image" />
+    <meta name="twitter:title"       content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image"       content={image} />
+    <meta name="twitter:image:alt"   content="David Poza — Web Developer portfolio preview" />
+
+    <!-- ─── Theme & PWA ─── -->
+    <meta name="theme-color" content="#e8d44d" />
+    <meta name="color-scheme" content="dark light" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <!-- ─── Favicons ─── -->
+    <link rel="icon"             href="/favicon.ico" sizes="48x48" />
+    <link rel="icon"             href="/favicon.svg" type="image/svg+xml" />
+    <!-- apple-touch-icon: add a 180×180 PNG at /apple-touch-icon.png and uncomment: -->
+    <!-- <link rel="apple-touch-icon" href="/apple-touch-icon.png" /> -->
+
+    <!-- ─── Sitemap ─── -->
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    <!-- ─── Preconnect Google Fonts ─── -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- ─── Structured Data (JSON-LD) ─── -->
+    <script type="application/ld+json" set:html={personSchema} />
+    <script type="application/ld+json" set:html={websiteSchema} />
+
+    <!-- ─── Prevent flash of wrong theme ─── -->
+    <script is:inline>
+      (function () {
+        const saved = localStorage.getItem('theme');
+        if (saved === 'light') document.documentElement.classList.add('light');
+      })();
+    </script>
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

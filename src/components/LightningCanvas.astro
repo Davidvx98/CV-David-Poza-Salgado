@@ -1,0 +1,170 @@
+---
+// LightningCanvas.astro – Fondo sutil con rayos animados en Canvas
+---
+
+<canvas id="lightning-canvas" aria-hidden="true"></canvas>
+
+<script>
+  const canvas = document.getElementById('lightning-canvas') as HTMLCanvasElement;
+  const ctx = canvas.getContext('2d')!;
+
+  let W = 0, H = 0;
+
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize, { passive: true });
+
+  // ─── Lightning bolt generator ─────────────────────────
+  interface Bolt {
+    segments: { x: number; y: number }[];
+    alpha: number;
+    maxAlpha: number;
+    decay: number;
+    width: number;
+    color: string;
+    branches: Branch[];
+  }
+
+  interface Branch {
+    segments: { x: number; y: number }[];
+    alpha: number;
+  }
+
+  function generateBolt(): Bolt {
+    const isLight = document.documentElement.classList.contains('light');
+    const color = isLight ? '90, 60, 0' : '232, 212, 77';
+
+    const startX = Math.random() * W;
+    const segments: { x: number; y: number }[] = [{ x: startX, y: 0 }];
+    let x = startX;
+    let y = 0;
+    const steps = 12 + Math.floor(Math.random() * 10);
+    const stepH = H / steps;
+
+    const branches: Branch[] = [];
+
+    for (let i = 0; i < steps; i++) {
+      x += (Math.random() - 0.5) * 80;
+      y += stepH;
+      segments.push({ x, y });
+
+      // Occasional branch
+      if (Math.random() < 0.3 && i > 1) {
+        const bx = x;
+        const by = y;
+        const bsegs: { x: number; y: number }[] = [{ x: bx, y: by }];
+        let bxc = bx, byc = by;
+        const bSteps = 3 + Math.floor(Math.random() * 4);
+        for (let j = 0; j < bSteps; j++) {
+          bxc += (Math.random() - 0.5) * 60;
+          byc += stepH * 0.8;
+          bsegs.push({ x: bxc, y: byc });
+        }
+        branches.push({ segments: bsegs, alpha: 1 });
+      }
+    }
+
+    return {
+      segments,
+      alpha: 0,
+      maxAlpha: 0.15 + Math.random() * 0.2,
+      decay: 0.01 + Math.random() * 0.015,
+      width: 0.5 + Math.random() * 1,
+      color,
+      branches,
+    };
+  }
+
+  const bolts: Bolt[] = [];
+  let lastBolt = 0;
+  const BOLT_INTERVAL = 2200; // ms between bolts
+
+  function drawBolt(bolt: Bolt) {
+    if (bolt.alpha <= 0) return;
+
+    // Main bolt
+    ctx.beginPath();
+    ctx.moveTo(bolt.segments[0].x, bolt.segments[0].y);
+    for (let i = 1; i < bolt.segments.length; i++) {
+      ctx.lineTo(bolt.segments[i].x, bolt.segments[i].y);
+    }
+    ctx.strokeStyle = `rgba(${bolt.color}, ${bolt.alpha})`;
+    ctx.lineWidth = bolt.width;
+    ctx.shadowColor = `rgba(${bolt.color}, ${bolt.alpha * 0.6})`;
+    ctx.shadowBlur = 6;
+    ctx.stroke();
+
+    // Glow pass
+    ctx.beginPath();
+    ctx.moveTo(bolt.segments[0].x, bolt.segments[0].y);
+    for (let i = 1; i < bolt.segments.length; i++) {
+      ctx.lineTo(bolt.segments[i].x, bolt.segments[i].y);
+    }
+    ctx.strokeStyle = `rgba(${bolt.color}, ${bolt.alpha * 0.3})`;
+    ctx.lineWidth = bolt.width * 4;
+    ctx.shadowBlur = 12;
+    ctx.stroke();
+
+    // Branches
+    for (const branch of bolt.branches) {
+      if (branch.segments.length < 2) continue;
+      ctx.beginPath();
+      ctx.moveTo(branch.segments[0].x, branch.segments[0].y);
+      for (let i = 1; i < branch.segments.length; i++) {
+        ctx.lineTo(branch.segments[i].x, branch.segments[i].y);
+      }
+      ctx.strokeStyle = `rgba(${bolt.color}, ${bolt.alpha * 0.6})`;
+      ctx.lineWidth = bolt.width * 0.5;
+      ctx.shadowBlur = 4;
+      ctx.stroke();
+    }
+
+    ctx.shadowBlur = 0;
+  }
+
+  let phase: 'fade-in' | 'hold' | 'fade-out' = 'fade-in';
+  let holdFrames = 0;
+
+  function updateBolt(bolt: Bolt) {
+    // Simple state machine per bolt (store phase internally)
+    const b = bolt as Bolt & { _phase?: string; _hold?: number };
+    if (!b._phase) b._phase = 'fade-in';
+
+    if (b._phase === 'fade-in') {
+      bolt.alpha += 0.04;
+      if (bolt.alpha >= bolt.maxAlpha) {
+        bolt.alpha = bolt.maxAlpha;
+        b._phase = 'hold';
+        b._hold = 0;
+      }
+    } else if (b._phase === 'hold') {
+      b._hold = (b._hold ?? 0) + 1;
+      if ((b._hold ?? 0) > 8) b._phase = 'fade-out';
+    } else {
+      bolt.alpha -= bolt.decay;
+    }
+  }
+
+  function tick(timestamp: number) {
+    ctx.clearRect(0, 0, W, H);
+
+    // Spawn new bolt
+    if (timestamp - lastBolt > BOLT_INTERVAL + Math.random() * 1500) {
+      bolts.push(generateBolt());
+      if (bolts.length > 4) bolts.shift();
+      lastBolt = timestamp;
+    }
+
+    for (const bolt of bolts) {
+      updateBolt(bolt);
+      drawBolt(bolt);
+    }
+
+    requestAnimationFrame(tick);
+  }
+
+  requestAnimationFrame(tick);
+</script>
