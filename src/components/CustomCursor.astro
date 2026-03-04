@@ -1,0 +1,61 @@
+---
+// CustomCursor.astro – Cursor personalizado con dot + ring
+---
+
+<div id="cursor-dot"></div>
+<div id="cursor-ring"></div>
+
+<script>
+  const dot = document.getElementById('cursor-dot')!;
+  const ring = document.getElementById('cursor-ring')!;
+
+  let mouseX = -100, mouseY = -100;
+  let ringX = -100, ringY = -100;
+  let rafId: number;
+
+  document.addEventListener('mousemove', (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    dot.style.left = mouseX + 'px';
+    dot.style.top  = mouseY + 'px';
+  });
+
+  // Ring follows with smooth lerp
+  function animateRing() {
+    const ease = 0.14;
+    ringX += (mouseX - ringX) * ease;
+    ringY += (mouseY - ringY) * ease;
+    ring.style.left = ringX + 'px';
+    ring.style.top  = ringY + 'px';
+    rafId = requestAnimationFrame(animateRing);
+  }
+  animateRing();
+
+  // Hover states
+  const interactiveSelector = 'a, button, [role="button"], input, textarea, label, .project-card, .social-link, .theme-toggle, .skip-btn';
+
+  document.addEventListener('mouseover', (e) => {
+    if ((e.target as Element).closest(interactiveSelector)) {
+      ring.classList.add('hovering');
+    }
+  });
+
+  document.addEventListener('mouseout', (e) => {
+    if ((e.target as Element).closest(interactiveSelector)) {
+      ring.classList.remove('hovering');
+    }
+  });
+
+  document.addEventListener('mousedown', () => dot.classList.add('clicking'));
+  document.addEventListener('mouseup',   () => dot.classList.remove('clicking'));
+
+  // Hide cursor when leaving window
+  document.addEventListener('mouseleave', () => {
+    dot.style.opacity = '0';
+    ring.style.opacity = '0';
+  });
+  document.addEventListener('mouseenter', () => {
+    dot.style.opacity = '1';
+    ring.style.opacity = '';
+  });
+</script>

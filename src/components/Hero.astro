@@ -1,0 +1,155 @@
+---
+// Hero.astro – Sección principal con nombre, rol y CTAs
+---
+
+<section id="hero" aria-label="Presentación">
+  <div class="hero-content">
+    <span class="hero-eyebrow">Disponible para proyectos</span>
+
+    <h1 class="hero-name">
+      David
+      <span>Poza.</span>
+    </h1>
+
+    <p class="hero-role">Web Developer &amp; UI Friendly</p>
+
+    <p class="hero-desc">
+      Construyo experiencias web rápidas, accesibles y visualmente
+      impactantes. Desde la arquitectura hasta el último píxel.
+    </p>
+
+    <div class="hero-ctas">
+      <a href="#projects" class="btn-primary">
+        Ver proyectos
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+          <path d="M2 6h8M7 3l3 3-3 3" stroke="currentColor" stroke-width="1.5"
+            stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+      <a href="#contact" class="btn-secondary" id="hero-hablemos">Hablemos</a>
+    </div>
+  </div>
+
+  <div class="hero-photo-wrap" id="heroPhotoWrap" aria-hidden="true">
+    <img src="/img/foto_cara.jpeg" alt="David Poza" class="hero-photo" id="heroPhoto" />
+    <!-- Signo de interrogación sobre la foto borrosa -->
+    <span class="photo-question" id="photoQuestion" aria-hidden="true">?</span>
+    <!-- Aviso contextual: mouse en desktop, arrastre en mobile -->
+    <p class="photo-hint" id="photoHint">
+      <span class="hint-desktop">Pasa el ratón por la foto</span>
+      <span class="hint-mobile">Arrastra el dedo por la foto</span>
+    </p>
+  </div>
+</section>
+
+<script>
+  const wrap = document.getElementById('heroPhotoWrap') as HTMLElement;
+  const img  = document.getElementById('heroPhoto')    as HTMLImageElement;
+
+  const canvas = document.createElement('canvas');
+  canvas.className = 'hero-reveal-canvas';
+  canvas.setAttribute('aria-hidden', 'true');
+  wrap.appendChild(canvas);
+
+  const ctx = canvas.getContext('2d')!;
+  let revealed      = false;
+  let checkScheduled = false;
+  const RADIUS = 60; // radio del pincel en px (coordenadas canvas)
+
+  function drawBlurred() {
+    const w = wrap.offsetWidth;
+    const h = wrap.offsetHeight;
+    if (w === 0 || h === 0) return;
+    canvas.width  = w;
+    canvas.height = h;
+    ctx.filter = 'blur(14px)';
+    ctx.drawImage(img, 0, 0, w, h);
+    ctx.filter = 'none';
+  }
+
+  if (img.complete && img.naturalWidth > 0) {
+    drawBlurred();
+  } else {
+    img.addEventListener('load', drawBlurred, { once: true });
+  }
+
+  // Comprueba qué porcentaje real del canvas es ya transparente.
+  // Se ejecuta en RAF (max 60fps) para no bloquear el hilo.
+  function scheduleCheck() {
+    if (checkScheduled || revealed) return;
+    checkScheduled = true;
+    requestAnimationFrame(() => {
+      checkScheduled = false;
+      if (revealed) return;
+      // Muestreo cada 4º píxel (stride 16 bytes) — rápido y suficientemente preciso
+      const data  = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+      let transparent = 0;
+      const step = 16; // bytes entre muestras (4 canales * 4 píxeles de salto)
+      const total = Math.floor(data.length / step);
+      for (let i = 3; i < data.length; i += step) {
+        if (data[i] < 10) transparent++; // canal alfa casi cero → borrado
+      }
+      if (transparent / total >= 0.30) {
+        revealed = true;
+        canvas.style.transition = 'opacity 0.7s ease';
+        canvas.style.opacity    = '0';
+        // Ocultar también el signo de interrogación
+        const q = document.getElementById('photoQuestion') as HTMLElement | null;
+        if (q) {
+          // Parar la animación CSS antes de transicionar la opacidad
+          q.style.animation  = 'none';
+          // Forzar reflow para que el navegador aplique animation:none
+          void q.offsetHeight;
+          q.style.transition = 'opacity 0.6s ease';
+          q.style.opacity    = '0';
+          setTimeout(() => q.remove(), 700);
+        }
+        setTimeout(() => canvas.remove(), 800);
+      }
+    });
+  }
+
+  const hint = document.getElementById('photoHint') as HTMLElement | null;
+
+  function hideHint() {
+    if (!hint) return;
+    hint.style.opacity    = '0';
+    hint.style.transform  = 'translateX(-50%) translateY(6px)';
+    setTimeout(() => hint.remove(), 400);
+  }
+
+  function revealAt(x: number, y: number) {
+    if (revealed) return;
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.beginPath();
+    ctx.arc(x, y, RADIUS, 0, Math.PI * 2);
+    ctx.fill();
+    scheduleCheck();
+  }
+
+  wrap.addEventListener('mousemove', (e) => {
+    if (revealed) return;
+    hideHint();
+    const rect   = wrap.getBoundingClientRect();
+    const scaleX = canvas.width  / rect.width;
+    const scaleY = canvas.height / rect.height;
+    revealAt((e.clientX - rect.left) * scaleX, (e.clientY - rect.top) * scaleY);
+  });
+
+  wrap.addEventListener('touchmove', (e) => {
+    if (revealed) return;
+    e.preventDefault();
+    hideHint();
+    const touch  = e.touches[0];
+    const rect   = wrap.getBoundingClientRect();
+    const scaleX = canvas.width  / rect.width;
+    const scaleY = canvas.height / rect.height;
+    revealAt((touch.clientX - rect.left) * scaleX, (touch.clientY - rect.top) * scaleY);
+  }, { passive: false });
+
+  // ── Botón Hablemos → abre la tarjeta de contacto
+  document.getElementById('hero-hablemos')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    window.dispatchEvent(new CustomEvent('open-contact-card'));
+  });
+</script>

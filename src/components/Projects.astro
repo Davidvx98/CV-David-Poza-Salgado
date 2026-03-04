@@ -1,0 +1,55 @@
+---
+// Projects.astro – Grid de proyectos con cards
+const projects = [
+  {
+    num: '01',
+    title: 'teampoza.dev',
+    desc: 'Team Poza community platform. Custom design, interactive experiences and dynamic content built for an engaged audience.',
+    tags: ['Web', 'UI/UX', 'Community'],
+    href: 'https://teampoza.dev',
+    featured: true,
+  },
+  {
+    num: '02',
+    title: 'the-choice-protocol.teampoza.dev',
+    desc: 'AI-powered interactive narrative experience that guides you through cinematic scenes to discover what to watch.',
+    tags: ['Astro', 'TypeScript', 'AI'],
+    href: 'https://the-choice-protocol.teampoza.dev',
+    featured: true,
+  },
+  {
+    num: '03',
+    title: 'RuletaSorteos.es',
+    desc: 'Free online roulette and raffle tool with Provably Fair system and up to 500 participants. 100% local.',
+    tags: ['Astro', 'TypeScript', 'Canvas'],
+    href: 'https://ruletasorteos.es',
+    featured: false,
+  },
+];
+---
+
+<section id="projects" class="section" aria-label="Projects">
+  <span class="section-label">Projects</span>
+  <h2 class="section-title reveal">Selected work</h2>
+
+  <div class="projects-grid">
+    {projects.map((p) => (
+      <a href={p.href} target="_blank" rel="noopener noreferrer"
+        class={`project-card reveal${p.featured ? ' project-featured' : ''}`}
+        aria-label={`View project: ${p.title}`}>
+        <div class="project-card-top">
+          <span class="project-num">— {p.num}</span>
+          {p.featured && <span class="project-badge">Featured</span>}
+        </div>
+        <h3 class="project-title">{p.title}</h3>
+        <p class="project-desc">{p.desc}</p>
+        <div class="project-footer">
+          <div class="project-tags">
+            {p.tags.map((t) => <span class="project-tag">{t}</span>)}
+          </div>
+          <div class="project-arrow" aria-hidden="true">↗</div>
+        </div>
+      </a>
+    ))}
+  </div>
+</section>

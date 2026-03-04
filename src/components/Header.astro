@@ -1,0 +1,108 @@
+---
+// Header.astro – Navegación fija con toggle dark/light + toggle animación intro
+---
+
+<header class="site-header" role="banner">
+  <a href="#hero" class="nav-logo" aria-label="David Poza - inicio">
+    <svg class="nav-logo-svg" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg"
+      width="32" height="32" fill="none" aria-hidden="true">
+      <!-- Shared vertical stem -->
+      <path d="M6 3.5 L6 26.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/>
+      <!-- D: full-height right arc -->
+      <path d="M6 3.5 C20 3.5 23 10 23 15 C23 20 20 26.5 6 26.5"
+        stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/>
+      <!-- P: upper-half bump in accent colour -->
+      <path d="M6 3.5 C15 3.5 18 7.5 18 11 C18 14.5 15 15 6 15"
+        stroke="var(--accent)" stroke-width="2.2" stroke-linecap="round"/>
+    </svg>
+  </a>
+
+  <nav aria-label="Navegación principal">
+    <ul class="nav-links">
+      <li><a href="#projects">Proyectos</a></li>
+      <li><a href="#skills">Skills</a></li>
+      <li>
+        <button
+          class="nav-contact"
+          id="nav-contact-btn"
+          aria-label="Abrir tarjeta de contacto"
+        >Contacto</button>
+      </li>
+
+      <!-- Toggle animación intro (ON/OFF) -->
+      <li class="anim-toggle-wrap">
+        <span class="anim-toggle-label">Animación</span>
+        <div
+          class="anim-toggle-group"
+          id="anim-toggle"
+          role="group"
+          aria-label="Animación de entrada: ON u OFF"
+        >
+          <div class="anim-indicator" id="anim-indicator"></div>
+          <button class="anim-btn" id="anim-btn-on"  aria-pressed="true">ON</button>
+          <button class="anim-btn" id="anim-btn-off" aria-pressed="false">OFF</button>
+        </div>
+      </li>
+
+      <!-- Toggle dark/light -->
+      <li>
+        <button
+          class="theme-toggle"
+          id="theme-toggle"
+          aria-label="Cambiar tema claro / oscuro"
+          title="Modo claro / oscuro"
+        ></button>
+      </li>
+    </ul>
+  </nav>
+</header>
+
+<script>
+  // ── Theme toggle
+  const themeBtn = document.getElementById('theme-toggle')!;
+  const html = document.documentElement;
+
+  function applyTheme(theme: 'dark' | 'light') {
+    html.classList.toggle('light', theme === 'light');
+    localStorage.setItem('theme', theme);
+  }
+
+  themeBtn.addEventListener('click', () => {
+    applyTheme(html.classList.contains('light') ? 'dark' : 'light');
+  });
+
+  // ── Intro animation toggle (ON/OFF)
+  const animBtnOn    = document.getElementById('anim-btn-on')!  as HTMLButtonElement;
+  const animBtnOff   = document.getElementById('anim-btn-off')! as HTMLButtonElement;
+  const animIndicator = document.getElementById('anim-indicator')!;
+
+  function isIntroEnabled(): boolean {
+    return localStorage.getItem('intro-disabled') !== '1';
+  }
+
+  function syncAnimToggle(enabled: boolean) {
+    animBtnOn.classList.toggle('active',  enabled);
+    animBtnOff.classList.toggle('active', !enabled);
+    animBtnOn.setAttribute('aria-pressed',  String(enabled));
+    animBtnOff.setAttribute('aria-pressed', String(!enabled));
+    animIndicator.classList.toggle('at-off', !enabled);
+  }
+
+  // Estado inicial
+  syncAnimToggle(isIntroEnabled());
+
+  animBtnOn.addEventListener('click', () => {
+    localStorage.setItem('intro-disabled', '0');
+    syncAnimToggle(true);
+  });
+
+  animBtnOff.addEventListener('click', () => {
+    localStorage.setItem('intro-disabled', '1');
+    syncAnimToggle(false);
+  });
+
+  // ── Contacto: abrir tarjeta de contacto
+  document.getElementById('nav-contact-btn')?.addEventListener('click', () => {
+    window.dispatchEvent(new CustomEvent('open-contact-card'));
+  });
+</script>

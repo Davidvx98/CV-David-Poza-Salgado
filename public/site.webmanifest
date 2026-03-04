@@ -1,0 +1,23 @@
+{
+  "name": "David Poza — Web Developer",
+  "short_name": "David Poza",
+  "description": "Portfolio of David Poza, Web Developer specialised in fast, clean and visually striking web experiences.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#09090f",
+  "theme_color": "#e8d44d",
+  "lang": "en",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "48x48",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

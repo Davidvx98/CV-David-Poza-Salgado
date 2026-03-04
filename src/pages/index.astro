@@ -1,0 +1,94 @@
+---
+import Layout from '../layouts/Layout.astro';
+import CustomCursor from '../components/CustomCursor.astro';
+import LightningCanvas from '../components/LightningCanvas.astro';
+import EnvelopeIntro from '../components/EnvelopeIntro.astro';
+import Header from '../components/Header.astro';
+import Hero from '../components/Hero.astro';
+import Projects from '../components/Projects.astro';
+import Skills from '../components/Skills.astro';
+import ContactCard from '../components/ContactCard.astro';
+---
+
+<Layout>
+  <!-- Custom cursor -->
+  <CustomCursor />
+
+  <!-- Ambient lightning background -->
+  <LightningCanvas />
+
+  <!-- Intro sequence (envelope) -->
+  <EnvelopeIntro />
+
+  <!-- Fixed header -->
+  <Header />
+
+  <!-- Main content -->
+  <main>
+    <Hero />
+    <Projects />
+    <Skills />
+  </main>
+
+  <!-- Overlay tarjeta de contacto -->
+  <ContactCard />
+
+  <!-- Footer -->
+  <footer>
+    <p>Diseñado &amp; desarrollado por <span>David Poza</span> · {new Date().getFullYear()}</p>
+  </footer>
+</Layout>
+
+<!-- Scroll reveal observer -->
+<script>
+  const revealEls = document.querySelectorAll<HTMLElement>('.reveal');
+
+  function triggerReveal(el: HTMLElement) {
+    if (el.classList.contains('visible')) return;
+    const siblings = el.parentElement?.querySelectorAll<HTMLElement>('.reveal');
+    if (siblings) {
+      let delay = 0;
+      siblings.forEach((s) => {
+        if (!s.classList.contains('visible')) {
+          s.style.transitionDelay = `${delay}ms`;
+          delay += 80;
+        }
+      });
+    }
+    el.classList.add('visible');
+    observer.unobserve(el);
+  }
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) triggerReveal(entry.target as HTMLElement);
+      });
+    },
+    { threshold: 0, rootMargin: '0px 0px -40px 0px' }
+  );
+
+  revealEls.forEach((el) => observer.observe(el));
+
+  // Re-comprobar reveals visibles tras cerrar la intro
+  window.addEventListener('portfolioEntered', () => {
+    // Paso 1: forzar los que ya están en el viewport ahora mismo
+    requestAnimationFrame(() => {
+      revealEls.forEach((el) => {
+        if (el.classList.contains('visible')) return;
+        const rect = el.getBoundingClientRect();
+        if (rect.top < window.innerHeight && rect.bottom > 0) {
+          triggerReveal(el as HTMLElement);
+        }
+      });
+    });
+    // Paso 2: tras las transiciones de is-built, forzar TODOS los restantes
+    // (About y Contact están fuera del viewport inicial y sus .reveal
+    //  pueden quedarse atascados en opacity:0 si el observer ya disparó)
+    setTimeout(() => {
+      document.querySelectorAll<HTMLElement>('.reveal:not(.visible)').forEach((el) => {
+        triggerReveal(el);
+      });
+    }, 1600);
+  });
+</script>

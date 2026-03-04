@@ -1,0 +1,196 @@
+---
+// ContactCard.astro – Overlay de tarjeta de presentación
+// Los datos sensibles (LinkedIn, teléfono) NUNCA aparecen en el HTML:
+// se ensamblan en tiempo de ejecución desde arrays de códigos de carácter.
+---
+
+<!-- Overlay: oculto por defecto, activado desde el nav -->
+<div id="contact-card-overlay" aria-modal="true" role="dialog" aria-label="Contacto" aria-hidden="true">
+  <div class="cc-backdrop"></div>
+
+  <div class="cc-card" id="cc-card">
+    <!-- Botón cerrar -->
+    <button class="cc-close" id="cc-close" aria-label="Cerrar contacto">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="2" stroke-linecap="round" aria-hidden="true">
+        <line x1="18" y1="6" x2="6" y2="18"/>
+        <line x1="6"  y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
+
+    <!-- Foto -->
+    <div class="cc-photo-wrap">
+      <img src="/img/foto_cara.jpeg" alt="David Poza" class="cc-photo" />
+    </div>
+
+    <!-- Info -->
+    <div class="cc-info">
+      <p class="cc-eyebrow">Tarjeta de contacto</p>
+      <h2 class="cc-name">David Poza</h2>
+      <p class="cc-role">Web Developer &amp; UI Friendly</p>
+
+      <ul class="cc-contacts" id="cc-contacts">
+        <!-- Rellenado por JS — los datos nunca están en el HTML fuente -->
+      </ul>
+
+      <a href="/cv-david-poza.pdf" download class="cc-cv-btn" aria-label="Descargar CV de David Poza">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/>
+          <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        Descargar CV
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── Decodificador: nunca almacenes datos sensibles como strings literales ──
+  function _d(codes: number[]): string {
+    return codes.map(c => String.fromCharCode(c)).join('');
+  }
+
+  // ── Datos sensibles como arrays de char-codes (no texto plano en HTML/JS fuente legible) ──
+  // LinkedIn URL: https://www.linkedin.com/in/david-poza-salgado/
+  const _liUrl  = _d([104,116,116,112,115,58,47,47,119,119,119,46,108,105,110,107,101,100,105,110,46,99,111,109,47,105,110,47,100,97,118,105,100,45,112,111,122,97,45,115,97,108,103,97,100,111,47]);
+  // LinkedIn texto visible
+  const _liText = _d([108,105,110,107,101,100,105,110,46,99,111,109,47,105,110,47,100,97,118,105,100,45,112,111,122,97,45,115,97,108,103,97,100,111]);
+  // Teléfono: SUSTITUYE este array por los char-codes de tu número real
+  // Ejemplo actual: "+34 612 345 678"  →  reemplaza con tu número real
+  const _phone  = _d([43,51,52,32,54,52,52,32,48,57,32,57,51,32,57,54]);
+
+  // ── Inyectar en el DOM ──
+  const list = document.getElementById('cc-contacts')!;
+
+  // ── Utilidad: parsea SVG estático con DOMParser (más estricto que innerHTML) ──
+  // DOMParser con 'image/svg+xml' rechaza HTML arbitrario y valida como XML.
+  function svgNode(markup: string): Node {
+    const doc = new DOMParser().parseFromString(markup, 'image/svg+xml');
+    const el  = doc.documentElement;
+    if (el.nodeName === 'parsererror') return document.createTextNode('');
+    return document.importNode(el, true);
+  }
+
+  // ── LinkedIn (safe DOM — dynamic data never goes through innerHTML) ──
+  const liItem = document.createElement('li');
+  liItem.className = 'cc-contact-item';
+
+  const liIconWrap = document.createElement('span');
+  liIconWrap.setAttribute('aria-hidden', 'true');
+  liIconWrap.style.display = 'contents';
+  liIconWrap.appendChild(svgNode(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">' +
+    '<path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853' +
+    ' 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9' +
+    ' 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337' +
+    ' 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782' +
+    ' 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0' +
+    ' 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774' +
+    ' 23.2 0 22.222 0h.003z"/></svg>'
+  ));
+  liItem.appendChild(liIconWrap);
+
+  // anchor — href and textContent set via properties, never via innerHTML
+  const liAnchor = document.createElement('a');
+  liAnchor.className = 'cc-link';
+  liAnchor.href = _liUrl;
+  liAnchor.textContent = _liText;
+  liAnchor.target = '_blank';
+  liAnchor.rel = 'noopener noreferrer';
+  liAnchor.setAttribute('aria-label', 'LinkedIn de David Poza');
+  liItem.appendChild(liAnchor);
+  list.appendChild(liItem);
+
+  // ── Teléfono (safe DOM) ──
+  const phItem = document.createElement('li');
+  phItem.className = 'cc-contact-item';
+
+  const phIconWrap = document.createElement('span');
+  phIconWrap.setAttribute('aria-hidden', 'true');
+  phIconWrap.style.display = 'contents';
+  phIconWrap.appendChild(svgNode(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"' +
+    ' stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' +
+    '<path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07' +
+    ' A19.5 19.5 0 013.07 9.8 19.79 19.79 0 01.01 1.18 2 2 0 012 0h3a2 2 0 012 1.72' +
+    ' c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2' +
+    ' 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92v2z"/></svg>'
+  ));
+  phItem.appendChild(phIconWrap);
+
+  const phAnchor = document.createElement('a');
+  phAnchor.className = 'cc-link cc-phone';
+  phAnchor.href = `tel:${_phone.replace(/\s/g, '')}`;
+  phAnchor.textContent = _phone;
+  phAnchor.setAttribute('aria-label', 'Llamar a David Poza');
+  phItem.appendChild(phAnchor);
+  list.appendChild(phItem);
+
+  // ── Abrir / cerrar overlay ──
+  const overlay  = document.getElementById('contact-card-overlay')!;
+  const card     = document.getElementById('cc-card')!;
+  const closeBtn = document.getElementById('cc-close')!;
+  const backdrop = overlay.querySelector<HTMLElement>('.cc-backdrop')!;
+
+  let closing = false;
+
+  function openCard() {
+    if (closing) return;
+    // Calcular origen de la animación desde el botón del nav
+    const btn = document.getElementById('nav-contact-btn');
+    if (btn) {
+      const r  = btn.getBoundingClientRect();
+      const vw = window.innerWidth  / 2;
+      const vh = window.innerHeight / 2;
+      const ox = (r.left + r.width  / 2) - vw;
+      const oy = (r.top  + r.height / 2) - vh;
+      card.style.setProperty('--fly-x', `${ox}px`);
+      card.style.setProperty('--fly-y', `${oy}px`);
+    }
+    overlay.removeAttribute('aria-hidden');
+    overlay.classList.add('is-open');
+    card.classList.remove('cc-card--fly', 'cc-card--fly-out');
+    void card.offsetWidth;
+    card.classList.add('cc-card--fly');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeCard() {
+    if (closing) return;
+    closing = true;
+
+    overlay.style.pointerEvents  = 'none';
+    backdrop.style.transition    = 'opacity 0.38s ease';
+    backdrop.style.opacity       = '0';
+
+    card.classList.remove('cc-card--fly');
+    void card.offsetWidth;
+    card.classList.add('cc-card--fly-out');
+
+    // e.target === card evita que el evento burbujee desde hijos
+    function onEnd(e: AnimationEvent) {
+      if (e.target !== card) return;
+      card.removeEventListener('animationend', onEnd);
+      overlay.classList.remove('is-open');
+      overlay.setAttribute('aria-hidden', 'true');
+      card.classList.remove('cc-card--fly-out');
+      backdrop.style.opacity      = '';
+      backdrop.style.transition   = '';
+      overlay.style.pointerEvents = '';
+      document.body.style.overflow = '';
+      closing = false;
+    }
+    card.addEventListener('animationend', onEnd);
+  }
+
+  closeBtn.addEventListener('click', closeCard);
+  backdrop.addEventListener('click', closeCard);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeCard();
+  });
+
+  // Escuchar el evento personalizado — evita contaminar window con un global
+  window.addEventListener('open-contact-card', () => openCard());
+</script>
