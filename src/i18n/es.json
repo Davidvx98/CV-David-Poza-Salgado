@@ -1,0 +1,139 @@
+{
+  "header": {
+    "nav": {
+      "projects": "Proyectos",
+      "skills": "Skills",
+      "contact": "Contacto",
+      "contactAria": "Abrir tarjeta de contacto",
+      "animation": "Animación",
+      "animationAria": "Animación de entrada: ON u OFF",
+      "themeAria": "Cambiar tema claro / oscuro",
+      "themeTitle": "Modo claro / oscuro"
+    },
+    "logo": {
+      "aria": "David Poza - inicio"
+    }
+  },
+  "hero": {
+    "eyebrow": "Disponible para proyectos",
+    "name": "David",
+    "lastName": "Poza.",
+    "role": "Web Developer & UI Friendly",
+    "desc": "Construyo experiencias web rápidas, accesibles y visualmente impactantes. Desde la arquitectura hasta el último píxel.",
+    "cta": {
+      "projects": "Ver proyectos",
+      "contact": "Hablemos"
+    },
+    "photo": {
+      "alt": "David Poza",
+      "hintDesktop": "Pasa el ratón por la foto",
+      "hintMobile": "Arrastra el dedo por la foto"
+    }
+  },
+  "about": {
+    "label": "Sobre mí",
+    "title": "Un developer<br/>orientado al detalle.",
+    "p1": "Soy <strong>David Poza</strong>, desarrollador web con pasión por construir interfaces que combinan rendimiento técnico y elegancia visual.",
+    "p2": "Trabajo desde la <strong>arquitectura frontend</strong> hasta los pequeños detalles de interacción que hacen que un producto se sienta pulido y profesional.",
+    "p3": "Me mueve la curiosidad, la mejora continua y entregar trabajo del que tanto el cliente como los usuarios estén orgullosos.",
+    "cta": {
+      "contact": "Contactar",
+      "cv": "Descargar CV"
+    },
+    "stats": {
+      "exp": {
+        "num": "+1",
+        "label": "Años de experiencia"
+      },
+      "projects": {
+        "num": "+4",
+        "label": "Proyectos completados"
+      },
+      "lighthouse": {
+        "num": "98",
+        "label": "Puntuación Lighthouse"
+      },
+      "coffee": {
+        "num": "∞",
+        "label": "Cafés por semana"
+      }
+    }
+  },
+  "skills": {
+    "label": "Skills",
+    "title": "Tecnologías y herramientas",
+    "groups": {
+      "frontend": "Frontend",
+      "design": "Diseño & UX",
+      "backend": "Backend",
+      "tools": "Herramientas"
+    },
+    "items": {
+      "html": "HTML / CSS",
+      "js": "JavaScript",
+      "ts": "TypeScript",
+      "tailwind": "Tailwind CSS",
+      "anim": "Animaciones",
+      "a11y": "Accesibilidad",
+      "responsive": "Responsive",
+      "node": "Node.js",
+      "api": "REST / GraphQL",
+      "postgres": "PostgreSQL",
+      "git": "Git / GitHub",
+      "vite": "Vite / Webpack",
+      "cicd": "CI/CD",
+      "testing": "Testing"
+    }
+  },
+  "projects": {
+    "label": "Proyectos",
+    "title": "Trabajos seleccionados",
+    "featured": "Destacado",
+    "items": {
+      "teampoza": {
+        "title": "teampoza.dev",
+        "desc": "Plataforma de comunidad Team Poza. Diseño a medida, experiencias interactivas y contenido dinámico construido para una audiencia comprometida.",
+        "tags": ["Web", "UI/UX", "Comunidad"]
+      },
+      "choiceprotocol": {
+        "title": "The Choice Protocol",
+        "desc": "Experiencia narrativa interactiva impulsada por IA (Gemini + Groq) que te guía a través de escenas cinematográficas para descubrir qué ver. Presentado a la Hackatón CubePath 2026.",
+        "tags": ["Astro", "TypeScript", "IA"]
+      },
+      "ruletasorteos": {
+        "title": "RuletaSorteos.es",
+        "desc": "Herramienta de sorteos y ruleta online gratuita con ruleta clásica, ruleta casino, sistema Provably Fair y hasta 500 participantes. 100% local, sin servidor.",
+        "tags": ["Astro", "TypeScript", "Canvas"]
+      }
+    },
+    "viewProject": "Ver proyecto: "
+  },
+  "contact": {
+    "label": "Contacto",
+    "title": "¿Trabajamos<br/>juntos?",
+    "sub": "Abierto a proyectos freelance, posiciones full-time y colaboraciones.",
+    "emailAria": "Enviar email a srpouza@gmail.com",
+    "socialAria": {
+      "github": "GitHub de David Poza",
+      "linkedin": "LinkedIn de David Poza",
+      "twitter": "Twitter de David Poza",
+      "codepen": "CodePen de David Poza"
+    },
+    "form": {
+      "title": "Envíame un mensaje",
+      "name": "Nombre",
+      "nameRequired": "El nombre es obligatorio",
+      "email": "Email",
+      "emailRequired": "El email es obligatorio",
+      "emailInvalid": "Email no válido",
+      "message": "Mensaje",
+      "messageRequired": "El mensaje es obligatorio",
+      "submit": "Enviar mensaje",
+      "sending": "Enviando...",
+      "successTitle": "¡Mensaje enviado!",
+      "successMsg": "Te responderé lo antes posible.",
+      "errorTitle": "Error al enviar",
+      "errorMsg": "Por favor, inténtalo de nuevo o escríbeme directamente."
+    }
+  }
+}

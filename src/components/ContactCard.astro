@@ -2,15 +2,19 @@
 // ContactCard.astro – Overlay de tarjeta de presentación
 // Los datos sensibles (LinkedIn, teléfono) NUNCA aparecen en el HTML:
 // se ensamblan en tiempo de ejecución desde arrays de códigos de carácter.
+import { getLangFromUrl, useTranslations } from '../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
 ---
 
 <!-- Overlay: oculto por defecto, activado desde el nav -->
-<div id="contact-card-overlay" aria-modal="true" role="dialog" aria-label="Contacto" aria-hidden="true">
+<div id="contact-card-overlay" aria-modal="true" role="dialog" aria-label={t('contact.label')} aria-hidden="true">
   <div class="cc-backdrop"></div>
 
   <div class="cc-card" id="cc-card">
     <!-- Botón cerrar -->
-    <button class="cc-close" id="cc-close" aria-label="Cerrar contacto">
+    <button class="cc-close" id="cc-close" aria-label={lang === 'es' ? 'Cerrar contacto' : 'Close contact'}>
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
         stroke-width="2" stroke-linecap="round" aria-hidden="true">
         <line x1="18" y1="6" x2="6" y2="18"/>
@@ -20,27 +24,27 @@
 
     <!-- Foto -->
     <div class="cc-photo-wrap">
-      <img src="/img/foto_cara.jpeg" alt="David Poza" class="cc-photo" />
+      <img src="/img/foto_cara.jpeg" alt={t('hero.photo.alt')} class="cc-photo" />
     </div>
 
     <!-- Info -->
     <div class="cc-info">
-      <p class="cc-eyebrow">Tarjeta de contacto</p>
+      <p class="cc-eyebrow">{lang === 'es' ? 'Tarjeta de contacto' : 'Contact card'}</p>
       <h2 class="cc-name">David Poza</h2>
-      <p class="cc-role">Web Developer &amp; UI Friendly</p>
+      <p class="cc-role">{t('hero.role')}</p>
 
       <ul class="cc-contacts" id="cc-contacts">
         <!-- Rellenado por JS — los datos nunca están en el HTML fuente -->
       </ul>
 
-      <a href="/cv-david-poza.pdf" download class="cc-cv-btn" aria-label="Descargar CV de David Poza">
+      <a href="/cv-david-poza.pdf" download class="cc-cv-btn" aria-label={lang === 'es' ? 'Descargar CV de David Poza' : 'Download David Poza CV'}>
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
           stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
           <polyline points="7 10 12 15 17 10"/>
           <line x1="12" y1="15" x2="12" y2="3"/>
         </svg>
-        Descargar CV
+        {t('about.cta.cv')}
       </a>
     </div>
   </div>
@@ -51,6 +55,20 @@
   function _d(codes: number[]): string {
     return codes.map(c => String.fromCharCode(c)).join('');
   }
+
+  // Get lang from URL
+  const lang = window.location.pathname.startsWith('/en') ? 'en' : 'es';
+  const ariaLabels = {
+    es: {
+      linkedin: 'LinkedIn de David Poza',
+      phone: 'Llamar a David Poza',
+    },
+    en: {
+      linkedin: 'David Poza LinkedIn',
+      phone: 'Call David Poza',
+    }
+  };
+  const a = ariaLabels[lang];
 
   // ── Datos sensibles como arrays de char-codes (no texto plano en HTML/JS fuente legible) ──
   // LinkedIn URL: https://www.linkedin.com/in/david-poza-salgado/
@@ -99,7 +117,7 @@
   liAnchor.textContent = _liText;
   liAnchor.target = '_blank';
   liAnchor.rel = 'noopener noreferrer';
-  liAnchor.setAttribute('aria-label', 'LinkedIn de David Poza');
+  liAnchor.setAttribute('aria-label', a.linkedin);
   liItem.appendChild(liAnchor);
   list.appendChild(liItem);
 
@@ -124,7 +142,7 @@
   phAnchor.className = 'cc-link cc-phone';
   phAnchor.href = `tel:${_phone.replace(/\s/g, '')}`;
   phAnchor.textContent = _phone;
-  phAnchor.setAttribute('aria-label', 'Llamar a David Poza');
+  phAnchor.setAttribute('aria-label', a.phone);
   phItem.appendChild(phAnchor);
   list.appendChild(phItem);
 

@@ -1,0 +1,152 @@
+---
+// LanguageSelector.astro - Selector de idioma para el header
+import { getLangFromUrl, translatePath } from '../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const currentPath = Astro.url.pathname;
+---
+
+<div class="lang-selector">
+  <button
+    class="lang-btn"
+    id="lang-toggle"
+    aria-label="Change language"
+    title="Cambiar idioma / Change language"
+  >
+    <span class="lang-current">{lang.toUpperCase()}</span>
+    <svg width="10" height="6" viewBox="0 0 10 6" fill="none" aria-hidden="true">
+      <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+
+  <div class="lang-dropdown" id="lang-dropdown">
+    <a
+      href={translatePath(currentPath, 'es')}
+      class={`lang-option ${lang === 'es' ? 'active' : ''}`}
+      aria-label="Cambiar a Español"
+    >
+      🇪🇸 <span>Español</span>
+    </a>
+    <a
+      href={translatePath(currentPath, 'en')}
+      class={`lang-option ${lang === 'en' ? 'active' : ''}`}
+      aria-label="Change to English"
+    >
+      🇬🇧 <span>English</span>
+    </a>
+  </div>
+</div>
+
+<script>
+  const langToggle = document.getElementById('lang-toggle');
+  const langDropdown = document.getElementById('lang-dropdown');
+
+  if (langToggle && langDropdown) {
+    langToggle.addEventListener('click', () => {
+      const isOpen = langDropdown.classList.toggle('open');
+      langToggle.setAttribute('aria-expanded', String(isOpen));
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!langToggle?.contains(e.target as Node) && !langDropdown?.contains(e.target as Node)) {
+        langDropdown?.classList.remove('open');
+        langToggle?.setAttribute('aria-expanded', 'false');
+      }
+    });
+  }
+</script>
+
+<style>
+  .lang-selector {
+    position: relative;
+  }
+
+  .lang-btn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 10px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .lang-btn:hover {
+    background: var(--bg-tertiary);
+    border-color: var(--accent);
+  }
+
+  .lang-btn svg {
+    transition: transform 0.2s ease;
+  }
+
+  .lang-btn[aria-expanded="true"] svg {
+    transform: rotate(180deg);
+  }
+
+  .lang-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 6px;
+    min-width: 140px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.2s ease;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+  }
+
+  .lang-dropdown.open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  .lang-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    text-decoration: none;
+    color: var(--text);
+    transition: background 0.2s ease;
+    font-size: 0.9rem;
+  }
+
+  .lang-option:hover {
+    background: var(--bg-tertiary);
+  }
+
+  .lang-option.active {
+    background: var(--accent);
+    color: var(--bg);
+    font-weight: 600;
+  }
+
+  .lang-option span {
+    flex: 1;
+  }
+
+  @media (max-width: 768px) {
+    .lang-btn {
+      padding: 5px 8px;
+      font-size: 0.85rem;
+    }
+
+    .lang-dropdown {
+      right: -10px;
+    }
+  }
+</style>

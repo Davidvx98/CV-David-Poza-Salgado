@@ -1,53 +1,48 @@
 ---
 // About.astro – Sección "Sobre mí" concisa con stats
+import { getLangFromUrl, useTranslations } from '../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
 ---
 
-<section id="about" aria-label="Sobre mí">
+<section id="about" aria-label={t('about.label')}>
   <div class="section">
     <div class="about-inner">
       <div class="about-text reveal">
-        <span class="section-label">Sobre mí</span>
-        <h2 class="section-title" style="margin-bottom: 28px;">Un developer<br/>orientado al detalle.</h2>
+        <span class="section-label">{t('about.label')}</span>
+        <h2 class="section-title" style="margin-bottom: 28px;" set:html={t('about.title')}></h2>
 
-        <p>
-          Soy <strong>David Poza</strong>, desarrollador web con pasión por construir
-          interfaces que combinan rendimiento técnico y elegancia visual.
-        </p>
-        <p>
-          Trabajo desde la <strong>arquitectura frontend</strong> hasta los pequeños
-          detalles de interacción que hacen que un producto se sienta pulido y profesional.
-        </p>
-        <p>
-          Me mueve la curiosidad, la mejora continua y entregar trabajo del que tanto
-          el cliente como los usuarios estén orgullosos.
-        </p>
+        <p set:html={t('about.p1')}></p>
+        <p set:html={t('about.p2')}></p>
+        <p set:html={t('about.p3')}></p>
 
         <div style="margin-top: 28px; display: flex; gap: 12px; flex-wrap: wrap;">
           <a href="mailto:davidpoza@email.com" class="btn-primary">
-            Contactar
+            {t('about.cta.contact')}
           </a>
           <a href="/cv-david-poza.pdf" class="btn-secondary" download>
-            Descargar CV
+            {t('about.cta.cv')}
           </a>
         </div>
       </div>
 
       <div class="about-stats reveal">
         <div class="stat-box">
-          <div class="stat-num">+3</div>
-          <div class="stat-label">Años de experiencia</div>
+          <div class="stat-num">{t('about.stats.exp.num')}</div>
+          <div class="stat-label">{t('about.stats.exp.label')}</div>
         </div>
         <div class="stat-box">
-          <div class="stat-num">+20</div>
-          <div class="stat-label">Proyectos completados</div>
+          <div class="stat-num">{t('about.stats.projects.num')}</div>
+          <div class="stat-label">{t('about.stats.projects.label')}</div>
         </div>
         <div class="stat-box">
-          <div class="stat-num">98</div>
-          <div class="stat-label">Puntuación Lighthouse</div>
+          <div class="stat-num">{t('about.stats.lighthouse.num')}</div>
+          <div class="stat-label">{t('about.stats.lighthouse.label')}</div>
         </div>
         <div class="stat-box">
-          <div class="stat-num">∞</div>
-          <div class="stat-label">Cafés por semana</div>
+          <div class="stat-num">{t('about.stats.coffee.num')}</div>
+          <div class="stat-label">{t('about.stats.coffee.label')}</div>
         </div>
       </div>
     </div>
