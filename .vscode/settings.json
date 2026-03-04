@@ -1,0 +1,6 @@
+{
+  // Forzar CRLF como final de línea en el editor
+  "files.eol": "\r\n",
+  // Opcional: ayuda a evitar espacios finales inesperados
+  "files.trimTrailingWhitespace": true
+}

@@ -1,0 +1,10 @@
+# Enforce CRLF in working tree for text files
+* text=auto eol=crlf
+
+# Treat common binary files as binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.pdf binary
