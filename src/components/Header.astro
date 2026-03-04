@@ -1,9 +1,14 @@
 ---
 // Header.astro – Navegación fija con toggle dark/light + toggle animación intro
+import LanguageSelector from './LanguageSelector.astro';
+import { getLangFromUrl, useTranslations } from '../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
 ---
 
 <header class="site-header" role="banner">
-  <a href="#hero" class="nav-logo" aria-label="David Poza - inicio">
+  <a href="#hero" class="nav-logo" aria-label={t('header.logo.aria')}>
     <svg class="nav-logo-svg" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg"
       width="32" height="32" fill="none" aria-hidden="true">
       <!-- Shared vertical stem -->
@@ -17,26 +22,26 @@
     </svg>
   </a>
 
-  <nav aria-label="Navegación principal">
+  <nav aria-label={t('header.nav.projects')}>
     <ul class="nav-links">
-      <li><a href="#projects">Proyectos</a></li>
-      <li><a href="#skills">Skills</a></li>
+      <li><a href="#projects">{t('header.nav.projects')}</a></li>
+      <li><a href="#skills">{t('header.nav.skills')}</a></li>
       <li>
         <button
           class="nav-contact"
           id="nav-contact-btn"
-          aria-label="Abrir tarjeta de contacto"
-        >Contacto</button>
+          aria-label={t('header.nav.contactAria')}
+        >{t('header.nav.contact')}</button>
       </li>
 
       <!-- Toggle animación intro (ON/OFF) -->
       <li class="anim-toggle-wrap">
-        <span class="anim-toggle-label">Animación</span>
+        <span class="anim-toggle-label">{t('header.nav.animation')}</span>
         <div
           class="anim-toggle-group"
           id="anim-toggle"
           role="group"
-          aria-label="Animación de entrada: ON u OFF"
+          aria-label={t('header.nav.animationAria')}
         >
           <div class="anim-indicator" id="anim-indicator"></div>
           <button class="anim-btn" id="anim-btn-on"  aria-pressed="true">ON</button>
@@ -44,13 +49,18 @@
         </div>
       </li>
 
+      <!-- Selector de idioma -->
+      <li>
+        <LanguageSelector />
+      </li>
+
       <!-- Toggle dark/light -->
       <li>
         <button
           class="theme-toggle"
           id="theme-toggle"
-          aria-label="Cambiar tema claro / oscuro"
-          title="Modo claro / oscuro"
+          aria-label={t('header.nav.themeAria')}
+          title={t('header.nav.themeTitle')}
         ></button>
       </li>
     </ul>

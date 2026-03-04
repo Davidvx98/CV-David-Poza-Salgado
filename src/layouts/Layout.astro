@@ -1,11 +1,13 @@
 ---
 import '../styles/global.css';
+import type { Lang } from '../i18n/utils';
 
 interface Props {
   title?: string;
   description?: string;
   image?: string;
   url?: string;
+  lang?: Lang;
 }
 
 const SITE = 'https://davidpozasalgado.dev';
@@ -15,6 +17,7 @@ const {
   description = 'Portfolio of David Poza, Web Developer specialised in fast, clean and visually striking web experiences. Available for freelance projects and full-time positions.',
   image       = `${SITE}/img/foto_cara.jpeg`,  // TODO: replace with a proper 1200×630 OG banner
   url         = SITE,
+  lang        = 'es',
 } = Astro.props;
 
 const canonicalURL = new URL(Astro.url.pathname, SITE).href;
@@ -44,7 +47,7 @@ const websiteSchema = JSON.stringify({
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang={lang}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />

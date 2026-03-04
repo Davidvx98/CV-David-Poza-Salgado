@@ -1,43 +1,46 @@
 ---
 // Hero.astro – Sección principal con nombre, rol y CTAs
+import { getLangFromUrl, useTranslations } from '../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
 ---
 
-<section id="hero" aria-label="Presentación">
+<section id="hero" aria-label={t('hero.role')}>
   <div class="hero-content">
-    <span class="hero-eyebrow">Disponible para proyectos</span>
+    <span class="hero-eyebrow">{t('hero.eyebrow')}</span>
 
     <h1 class="hero-name">
-      David
-      <span>Poza.</span>
+      {t('hero.name')}
+      <span>{t('hero.lastName')}</span>
     </h1>
 
-    <p class="hero-role">Web Developer &amp; UI Friendly</p>
+    <p class="hero-role">{t('hero.role')}</p>
 
     <p class="hero-desc">
-      Construyo experiencias web rápidas, accesibles y visualmente
-      impactantes. Desde la arquitectura hasta el último píxel.
+      {t('hero.desc')}
     </p>
 
     <div class="hero-ctas">
       <a href="#projects" class="btn-primary">
-        Ver proyectos
+        {t('hero.cta.projects')}
         <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
           <path d="M2 6h8M7 3l3 3-3 3" stroke="currentColor" stroke-width="1.5"
             stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </a>
-      <a href="#contact" class="btn-secondary" id="hero-hablemos">Hablemos</a>
+      <a href="#contact" class="btn-secondary" id="hero-hablemos">{t('hero.cta.contact')}</a>
     </div>
   </div>
 
   <div class="hero-photo-wrap" id="heroPhotoWrap" aria-hidden="true">
-    <img src="/img/foto_cara.jpeg" alt="David Poza" class="hero-photo" id="heroPhoto" />
+    <img src="/img/foto_cara.jpeg" alt={t('hero.photo.alt')} class="hero-photo" id="heroPhoto" />
     <!-- Signo de interrogación sobre la foto borrosa -->
     <span class="photo-question" id="photoQuestion" aria-hidden="true">?</span>
     <!-- Aviso contextual: mouse en desktop, arrastre en mobile -->
     <p class="photo-hint" id="photoHint">
-      <span class="hint-desktop">Pasa el ratón por la foto</span>
-      <span class="hint-mobile">Arrastra el dedo por la foto</span>
+      <span class="hint-desktop">{t('hero.photo.hintDesktop')}</span>
+      <span class="hint-mobile">{t('hero.photo.hintMobile')}</span>
     </p>
   </div>
 </section>

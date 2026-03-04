@@ -1,38 +1,43 @@
 ---
 // Skills.astro – Skills con logos SVG + puntuaciones 1-10
+import { getLangFromUrl, useTranslations } from '../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
 const groups = [
   {
-    name: 'Frontend',
+    name: t('skills.groups.frontend'),
     skills: [
-      { name: 'HTML / CSS',    level: 10, id: 'html'     },
-      { name: 'JavaScript',   level: 9,  id: 'js'       },
-      { name: 'TypeScript',   level: 9,  id: 'ts'       },
-      { name: 'Tailwind CSS', level: 9,  id: 'tailwind' },
+      { name: t('skills.items.html'),     level: 10, id: 'html'     },
+      { name: t('skills.items.js'),       level: 9,  id: 'js'       },
+      { name: t('skills.items.ts'),       level: 9,  id: 'ts'       },
+      { name: t('skills.items.tailwind'), level: 9,  id: 'tailwind' },
     ],
   },
   {
-    name: 'Diseño & UX',
+    name: t('skills.groups.design'),
     skills: [
-      { name: 'Animaciones',   level: 8, id: 'anim'      },
-      { name: 'Accesibilidad', level: 7, id: 'a11y'      },
-      { name: 'Responsive',    level: 9, id: 'responsive' },
+      { name: t('skills.items.anim'),       level: 8, id: 'anim'      },
+      { name: t('skills.items.a11y'),       level: 7, id: 'a11y'      },
+      { name: t('skills.items.responsive'), level: 9, id: 'responsive' },
     ],
   },
   {
-    name: 'Backend',
+    name: t('skills.groups.backend'),
     skills: [
-      { name: 'Node.js',        level: 8, id: 'node'     },
-      { name: 'REST / GraphQL', level: 8, id: 'api'      },
-      { name: 'PostgreSQL',     level: 7, id: 'postgres' },
+      { name: t('skills.items.node'),     level: 8, id: 'node'     },
+      { name: t('skills.items.api'),      level: 8, id: 'api'      },
+      { name: t('skills.items.postgres'), level: 7, id: 'postgres' },
     ],
   },
   {
-    name: 'Herramientas',
+    name: t('skills.groups.tools'),
     skills: [
-      { name: 'Git / GitHub',   level: 9, id: 'git'     },
-      { name: 'Vite / Webpack', level: 8, id: 'vite'    },
-      { name: 'CI/CD',          level: 7, id: 'cicd'    },
-      { name: 'Testing',        level: 7, id: 'testing' },
+      { name: t('skills.items.git'),     level: 9, id: 'git'     },
+      { name: t('skills.items.vite'),    level: 8, id: 'vite'    },
+      { name: t('skills.items.cicd'),    level: 7, id: 'cicd'    },
+      { name: t('skills.items.testing'), level: 7, id: 'testing' },
     ],
   },
 ];
@@ -132,9 +137,9 @@ const logos: Record<string, string> = {
 const allSkills = groups.flatMap(g => g.skills);
 ---
 
-<section id="skills" class="section" aria-label="Habilidades">
-  <span class="section-label">Skills</span>
-  <h2 class="section-title reveal">Tecnologías &amp; herramientas</h2>
+<section id="skills" class="section" aria-label={t('skills.label')}>
+  <span class="section-label">{t('skills.label')}</span>
+  <h2 class="section-title reveal">{t('skills.title')}</h2>
 
   <div class="skills-groups">
     {groups.map((g) => (
@@ -142,15 +147,15 @@ const allSkills = groups.flatMap(g => g.skills);
         <div class="skill-group-title">{g.name}</div>
         <!-- Hint: fades out once the card is activated -->
         <p class="skill-hint" aria-hidden="true">
-          <span class="skill-hint-desktop">Pasa el ratón para ver</span>
-          <span class="skill-hint-mobile">Toca la tarjeta para ver</span>
+          <span class="skill-hint-desktop">{lang === 'es' ? 'Pasa el ratón para ver' : 'Hover to see'}</span>
+          <span class="skill-hint-mobile">{lang === 'es' ? 'Toca la tarjeta para ver' : 'Tap the card to see'}</span>
         </p>
         <ul class="skill-list" role="list">
           {g.skills.map((s) => (
             <li class="skill-item">
               <span class="skill-icon" aria-label={s.name} title={s.name}
                 set:html={logos[s.id] ?? ''} />
-              <div class="skill-dots" aria-label={`${s.name}: ${s.level} de 10`}>
+              <div class="skill-dots" aria-label={`${s.name}: ${s.level} ${lang === 'es' ? 'de' : 'of'} 10`}>
                 {Array.from({length: 10}, (_, i) => (
                   <span
                     class={`skill-dot${i < s.level ? ' filled' : ''}`}
@@ -174,7 +179,7 @@ const allSkills = groups.flatMap(g => g.skills);
       <svg class="legend-chevron" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
         <path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
-      Ver leyenda
+      {lang === 'es' ? 'Ver leyenda' : 'View legend'}
     </button>
     <div class="skills-legend-grid" id="legendGrid" aria-hidden="true">
       {allSkills.map((s) => (

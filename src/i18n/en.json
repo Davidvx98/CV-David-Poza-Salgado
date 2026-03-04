@@ -1,0 +1,134 @@
+{
+  "header": {
+    "nav": {
+      "projects": "Projects",
+      "skills": "Skills",
+      "contact": "Contact",
+      "contactAria": "Open contact card",
+      "animation": "Animation",
+      "animationAria": "Intro animation: ON or OFF",
+      "themeAria": "Toggle light / dark theme",
+      "themeTitle": "Light / Dark mode"
+    },
+    "logo": {
+      "aria": "David Poza - home"
+    }
+  },
+  "hero": {
+    "eyebrow": "Available for projects",
+    "name": "David",
+    "lastName": "Poza.",
+    "role": "Web Developer & UI Friendly",
+    "desc": "I build fast, accessible, and visually impactful web experiences. From architecture to the last pixel.",
+    "cta": {
+      "projects": "View projects",
+      "contact": "Let's talk"
+    },
+    "photo": {
+      "alt": "David Poza",
+      "hintDesktop": "Hover over the photo",
+      "hintMobile": "Swipe your finger across the photo"
+    }
+  },
+  "about": {
+    "label": "About me",
+    "title": "A detail-oriented<br/>developer.",
+    "p1": "I'm <strong>David Poza</strong>, a web developer passionate about building interfaces that combine technical performance and visual elegance.",
+    "p2": "I work from <strong>frontend architecture</strong> to the small interaction details that make a product feel polished and professional.",
+    "p3": "I'm driven by curiosity, continuous improvement, and delivering work that both clients and users are proud of.",
+    "cta": {
+      "contact": "Contact",
+      "cv": "Download CV"
+    },
+    "stats": {
+      "exp": {
+        "num": "+1",
+        "label": "Years of experience"
+      },
+      "projects": {
+        "num": "+4",
+        "label": "Completed projects"
+      },
+      "lighthouse": {
+        "num": "98",
+        "label": "Lighthouse score"
+      },
+      "coffee": {
+        "num": "∞",
+        "label": "Coffees per week"
+      }
+    }
+  },
+  "skills": {
+    "label": "Skills",
+    "title": "Technologies and tools",
+    "groups": {
+      "frontend": "Frontend",
+      "design": "Design & UX",
+      "backend": "Backend",
+      "tools": "Tools"
+    },
+    "items": {
+      "html": "HTML / CSS",
+      "js": "JavaScript",
+      "ts": "TypeScript",
+      "tailwind": "Tailwind CSS",
+      "anim": "Animations",
+      "a11y": "Accessibility",
+      "responsive": "Responsive",
+      "node": "Node.js",
+      "api": "REST / GraphQL",
+      "postgres": "PostgreSQL",
+      "git": "Git / GitHub",
+      "vite": "Vite / Webpack",
+      "cicd": "CI/CD",
+      "testing": "Testing"
+    }
+  },
+  "projects": {
+    "label": "Projects",
+    "title": "Selected work",
+    "featured": "Featured",
+    "items": {
+      "teampoza": {
+        "title": "teampoza.dev",
+        "desc": "Team Poza community platform. Custom design, interactive experiences and dynamic content built for an engaged audience.",
+        "tags": ["Web", "UI/UX", "Community"]
+      },
+      "animegratis": {
+        "title": "animegratis.es",
+        "desc": "Anime streaming platform with a wide catalogue, fast search and an optimized user experience across all devices.",
+        "tags": ["Streaming", "Catalogue", "UX"]
+      }
+    },
+    "viewProject": "View project: "
+  },
+  "contact": {
+    "label": "Contact",
+    "title": "Let's work<br/>together?",
+    "sub": "Open to freelance projects, full-time positions and collaborations.",
+    "emailAria": "Send email to srpouza@gmail.com",
+    "socialAria": {
+      "github": "David Poza's GitHub",
+      "linkedin": "David Poza's LinkedIn",
+      "twitter": "David Poza's Twitter",
+      "codepen": "David Poza's CodePen"
+    },
+    "form": {
+      "title": "Send me a message",
+      "name": "Name",
+      "nameRequired": "Name is required",
+      "email": "Email",
+      "emailRequired": "Email is required",
+      "emailInvalid": "Invalid email",
+      "message": "Message",
+      "messageRequired": "Message is required",
+      "submit": "Send message",
+      "sending": "Sending...",
+      "successTitle": "Message sent!",
+      "successMsg": "I'll get back to you as soon as possible.",
+      "errorTitle": "Error sending",
+      "errorMsg": "Please try again or write to me directly."
+    }
+  }
+}
