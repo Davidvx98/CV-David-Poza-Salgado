@@ -2,7 +2,7 @@
   "header": {
     "nav": {
       "projects": "Proyectos",
-      "skills": "Skills",
+      "skills": "Habilidades",
       "contact": "Contacto",
       "contactAria": "Abrir tarjeta de contacto",
       "animation": "Animación",
@@ -60,7 +60,7 @@
     }
   },
   "skills": {
-    "label": "Skills",
+    "label": "Habilidades",
     "title": "Tecnologías y herramientas",
     "groups": {
       "frontend": "Frontend",

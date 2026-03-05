@@ -6,6 +6,11 @@
 <div id="cursor-ring"></div>
 
 <script>
+  // Don't run custom cursor on touch / pointer-coarse devices
+  if (!window.matchMedia('(pointer: fine)').matches) {
+    document.getElementById('cursor-dot')!.style.display = 'none';
+    document.getElementById('cursor-ring')!.style.display = 'none';
+  } else {
   const dot = document.getElementById('cursor-dot')!;
   const ring = document.getElementById('cursor-ring')!;
 
@@ -58,4 +63,5 @@
     dot.style.opacity = '1';
     ring.style.opacity = '';
   });
+  } // end pointer:fine guard
 </script>
