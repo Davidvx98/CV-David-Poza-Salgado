@@ -104,11 +104,13 @@ const t = useTranslations(lang);
   animBtnOn.addEventListener('click', () => {
     localStorage.setItem('intro-disabled', '0');
     syncAnimToggle(true);
+    window.dispatchEvent(new CustomEvent('anim-changed', { detail: { enabled: true } }));
   });
 
   animBtnOff.addEventListener('click', () => {
     localStorage.setItem('intro-disabled', '1');
     syncAnimToggle(false);
+    window.dispatchEvent(new CustomEvent('anim-changed', { detail: { enabled: false } }));
   });
 
   // ── Contacto: abrir tarjeta de contacto

@@ -148,7 +148,11 @@
     }
   }
 
+  let running = false;
+  let rafId = 0;
+
   function tick(timestamp: number) {
+    if (!running) return;
     ctx.clearRect(0, 0, W, H);
 
     // Spawn new bolt
@@ -163,8 +167,35 @@
       drawBolt(bolt);
     }
 
-    requestAnimationFrame(tick);
+    rafId = requestAnimationFrame(tick);
   }
 
-  requestAnimationFrame(tick);
+  function startLoop() {
+    if (running) return;
+    running = true;
+    canvas.style.display = '';
+    lastBolt = 0;
+    rafId = requestAnimationFrame(tick);
+  }
+
+  function stopLoop() {
+    running = false;
+    canvas.style.display = 'none';
+    if (rafId) { cancelAnimationFrame(rafId); rafId = 0; }
+    bolts.length = 0;
+    ctx.clearRect(0, 0, W, H);
+  }
+
+  // Init: respect animation toggle state
+  if (localStorage.getItem('intro-disabled') === '1') {
+    stopLoop();
+  } else {
+    startLoop();
+  }
+
+  // React to animation toggle changes from the header
+  window.addEventListener('anim-changed', (e: Event) => {
+    const { enabled } = (e as CustomEvent<{ enabled: boolean }>).detail;
+    if (enabled) startLoop(); else stopLoop();
+  });
 </script>

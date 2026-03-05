@@ -108,8 +108,14 @@ const websiteSchema = JSON.stringify({
     <!-- ─── Prevent flash of wrong theme ─── -->
     <script is:inline>
       (function () {
-        const saved = localStorage.getItem('theme');
+        var saved = localStorage.getItem('theme');
         if (saved === 'light') document.documentElement.classList.add('light');
+        // On first visit on mobile, disable animations by default
+        if (localStorage.getItem('intro-disabled') === null) {
+          if (window.matchMedia('(max-width: 767px)').matches) {
+            localStorage.setItem('intro-disabled', '1');
+          }
+        }
       })();
     </script>
   </head>
