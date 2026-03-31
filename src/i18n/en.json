@@ -66,7 +66,8 @@
       "frontend": "Frontend",
       "design": "Design & UX",
       "backend": "Backend",
-      "tools": "Tools"
+      "tools": "Tools",
+      "sysadmin": "Systems"
     },
     "items": {
       "html": "HTML / CSS",
@@ -82,7 +83,11 @@
       "git": "Git / GitHub",
       "vite": "Vite / Webpack",
       "cicd": "CI/CD",
-      "testing": "Testing"
+      "testing": "Testing",
+      "linux": "Linux",
+      "github": "GitHub",
+      "docker": "Docker",
+      "bash": "Bash / Shell"
     }
   },
   "projects": {
