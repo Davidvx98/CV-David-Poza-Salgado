@@ -110,6 +110,12 @@
         "desc": "Herramienta de sorteos y ruleta online gratuita con ruleta clásica, ruleta casino, sistema Provably Fair y hasta 500 participantes. 100% local, sin servidor.",
         "tags": ["Astro", "TypeScript", "Canvas"]
       }
+      ,
+      "ganadinero": {
+        "title": "Gana Dinero Web",
+        "desc": "Landing para monetización y captura de leads. Rápido, responsive y orientado a la conversión.",
+        "tags": ["Web", "Landing", "Monetización"]
+      }
     },
     "viewProject": "Ver proyecto: "
   },

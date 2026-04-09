@@ -110,6 +110,12 @@
         "desc": "Free online roulette and raffle tool with classic wheel, casino roulette, Provably Fair system and up to 500 participants. 100% local, no server required.",
         "tags": ["Astro", "TypeScript", "Canvas"]
       }
+      ,
+      "ganadinero": {
+        "title": "Gana Dinero Web",
+        "desc": "Landing focused on monetization and lead capture. Fast, responsive and conversion-oriented.",
+        "tags": ["Web", "Landing", "Monetization"]
+      }
     },
     "viewProject": "View project: "
   },
