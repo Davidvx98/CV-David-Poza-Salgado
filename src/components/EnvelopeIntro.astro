@@ -22,9 +22,13 @@
     <div class="env-fold-left"   aria-hidden="true"></div>
     <div class="env-fold-right"  aria-hidden="true"></div>
     <div class="env-fold-top"    aria-hidden="true"></div>
-    <!-- Solapa -->
+    <!-- Carta: asoma por dentro del sobre y sube tras la solapa al abrir -->
+    <div class="envelope-letter" aria-hidden="true"></div>
+
+    <!-- Solapa: bisagra 3D real (rotateX), gira hacia atrás al abrir -->
     <div class="envelope-flap" id="flap">
       <div class="envelope-flap-face"></div>
+      <div class="envelope-flap-back"></div>
     </div>
 
     <!-- Sello de lacre: estrella que desaparece al hacer click -->
@@ -128,13 +132,14 @@
     // 1. El sello de lacre se escala y desvanece
     seal.classList.add('seal-break');
 
-    // 2. A los 150ms el flap desaparece (fade+sube)
+    // 2. A los 150ms la solapa gira sobre su bisagra 3D (rotateX, 0.75s)
     setTimeout(() => {
       envelope.classList.add('open');
     }, 150);
 
-    // 3. A los 500ms lanzar la tarjeta
-    setTimeout(launchCard, 500);
+    // 3. La carta empieza a asomar a los 150+280=430ms (ver transition-delay en CSS)
+    //    y la tarjeta real se lanza cuando la solapa ya está abierta del todo (~150+750ms)
+    setTimeout(launchCard, 900);
   }
 
   function launchCard() {

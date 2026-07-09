@@ -135,14 +135,15 @@ body {
   position: relative;
   width: 340px;
   height: 220px;
-  perspective: 1000px;
+  perspective: 1400px;
+  perspective-origin: 50% 15%;
 }
 
 /*
   Z-index dentro del envelope-wrap (stacking local):
-  2 → envelope-body (panel sólido)
-  4 → env-fold-* (pliegues)
-  8 → envelope-flap (solapa 3D)
+  2 → envelope-body (panel sólido, contiene los pliegues laterales/inferior)
+  6 → envelope-letter (carta que asoma por dentro del sobre)
+  8 → envelope-flap (solapa 3D, bisagra real con rotateX)
 
   Fuera del envelope-wrap, dentro del overlay:
   9200 → .envelope-seal (por encima de todo el sobre)
@@ -154,21 +155,23 @@ body {
 
 /*
   ══════════════════════════════════════════════════════
-  SOBRE (ENVELOPE) — diseño blanco/negro, geometría real
+  SOBRE (ENVELOPE) — geometría 3D real con transform-style
   ══════════════════════════════════════════════════════
 
   Estructura de un sobre real (de atrás a adelante):
-    1. Cuerpo blanco (rectángulo base)
-    2. Pliegue inferior  → triángulo: esquinas bottom + centro     z:3
-    3. Pliegues laterales → triángulos: esquinas lado + centro     z:4
-    4. Interior solapa  → mismo triángulo que la solapa (hidden)   z:5
-    5. Solapa 3D         → triángulo: BASE ARRIBA, PICO al centro  z:8
-       · bisagra en el borde SUPERIOR (transform-origin: top)
-       · al abrir: el PICO baja/gira hacia atrás
+    1. Cuerpo blanco (rectángulo base) + pliegues laterales/inferior
+    2. Carta: rectángulo que asoma y sube por detrás de la solapa
+    3. Solapa: bisagra real en el borde superior (rotateX 3D),
+       gira hacia atrás -180° revelando el interior al abrir
 
   Colores: blanco y grises para máximo contraste sobre fondo oscuro
   ══════════════════════════════════════════════════════
 */
+
+.envelope-wrap,
+.envelope-wrap * {
+  transform-style: preserve-3d;
+}
 
 /* ── 1. Cuerpo base ─────────────────────────────────── */
 .envelope-body {
@@ -178,12 +181,14 @@ body {
   border: 1.5px solid #111111;
   border-radius: 2px;
   z-index: 2;
+  overflow: hidden;
   box-shadow:
     0 0 50px rgba(232,212,77,0.18),
     0 16px 48px rgba(0,0,0,0.85);
+  transition: box-shadow 0.5s ease;
 }
 
-/* ── 2. Pliegue inferior (z:3, debajo de los laterales) */
+/* ── 2. Pliegue inferior ─────────────────────────────── */
 .env-fold-bottom {
   position: absolute;
   inset: 0;
@@ -192,11 +197,9 @@ body {
   /* Triángulo: esquina bottom-left, bottom-right, pico en el centro */
   clip-path: polygon(0% 100%, 100% 100%, 50% 50%);
   background: #cccccc;
-  /* línea de pliegue: borde superior diagonal simulado con outline */
-  outline: none;
 }
 
-/* ── 3. Pliegues laterales (z:4) ─────────────────────── */
+/* ── 3. Pliegues laterales ───────────────────────────── */
 .env-fold-left {
   position: absolute;
   inset: 0;
@@ -220,15 +223,16 @@ body {
 /* ── 4. Interior de la solapa (oculto — ya no necesario) ── */
 .env-fold-top { display: none; }
 
-/* ── 5. Solapa (z:8) — desaparece al abrir (fade + sube) ── */
+/* ── 5. Solapa (z:8) — bisagra 3D real, gira hacia atrás ── */
 .envelope-flap {
   position: absolute;
   top: -1px; left: -1px; right: -1px;
   height: 112px;
   z-index: 8;
-  transition:
-    opacity   0.35s ease,
-    transform 0.4s  cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: 50% 0%;
+  transform: rotateX(0deg);
+  transition: transform 0.75s cubic-bezier(0.65, 0, 0.35, 1);
+  will-change: transform;
 }
 
 .envelope-flap-face {
@@ -237,15 +241,60 @@ body {
   background: #f5f5f5;
   /* BASE arriba, PICO al centro-inferior */
   clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
+  border-left:  2px solid #111111;
+  border-right: 2px solid #111111;
+  border-top:   2px solid #111111;
+  backface-visibility: hidden;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+}
+
+/* Cara trasera de la solapa: se ve al girar más allá de 90° */
+.envelope-flap-back {
+  position: absolute;
+  inset: 0;
+  background: #d4d4d4;
+  clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
   border-left:  1.5px solid #111111;
   border-right: 1.5px solid #111111;
   border-top:   1.5px solid #111111;
+  transform: rotateX(180deg);
+  backface-visibility: hidden;
 }
 
-/* Al abrir: el triángulo sube y desaparece */
+/* Al abrir: la solapa gira -175° sobre su bisagra superior, como un sobre real */
 .envelope-wrap.open .envelope-flap {
+  transform: rotateX(-175deg);
+}
+
+.envelope-wrap.open .envelope-body {
+  box-shadow:
+    0 0 70px rgba(232,212,77,0.3),
+    0 24px 60px rgba(0,0,0,0.9);
+}
+
+/* ── 6. Carta: asoma sutilmente por dentro del sobre tras la solapa ── */
+.envelope-letter {
+  position: absolute;
+  left: 50%;
+  bottom: 8px;
+  width: 78%;
+  height: 62%;
+  transform: translateX(-50%) translateY(0%);
+  background: linear-gradient(180deg, #fdfdfd 0%, #f2f2f2 100%);
+  border: 1.5px solid #111111;
+  border-radius: 2px;
+  z-index: 6;
   opacity: 0;
-  transform: translateY(-50px);
+  box-shadow: 0 -4px 18px rgba(0,0,0,0.15);
+  transition:
+    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity   0.3s ease;
+}
+
+.envelope-wrap.open .envelope-letter {
+  opacity: 1;
+  transition-delay: 0.45s, 0.45s;
+  transform: translateX(-50%) translateY(-22%);
 }
 
 /* ── Sello de lacre sobre el sobre ──────────────────────── */
