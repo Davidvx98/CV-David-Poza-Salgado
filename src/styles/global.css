@@ -723,7 +723,6 @@ main {
   /* Sin border, sin border-radius, sin box-shadow */
   overflow: visible;
   opacity: 0;
-  animation: fadeUp 0.9s ease 0.9s forwards;
 
   /*
     Mask con 4 gradientes en intersección:
@@ -835,7 +834,6 @@ main {
   align-items: center;
   gap: 12px;
   opacity: 0;
-  animation: fadeUp 0.8s ease 0.2s forwards;
 }
 
 .hero-eyebrow::before {
@@ -852,7 +850,6 @@ main {
   color: var(--text);
   margin-bottom: 10px;
   opacity: 0;
-  animation: fadeUp 0.8s ease 0.4s forwards;
 }
 
 .hero-name span {
@@ -867,7 +864,6 @@ main {
   letter-spacing: 0.06em;
   margin-bottom: 36px;
   opacity: 0;
-  animation: fadeUp 0.8s ease 0.55s forwards;
 }
 
 .hero-desc {
@@ -877,7 +873,6 @@ main {
   color: var(--text-muted);
   margin-bottom: 44px;
   opacity: 0;
-  animation: fadeUp 0.8s ease 0.7s forwards;
 }
 
 .hero-ctas {
@@ -885,8 +880,17 @@ main {
   gap: 14px;
   flex-wrap: wrap;
   opacity: 0;
-  animation: fadeUp 0.8s ease 0.85s forwards;
 }
+
+/* ── Las animaciones de entrada del hero se disparan al ENTRAR al portfolio
+   (body.is-built), no al cargar la página. Así, mientras la intro del sobre
+   está activa, no se "gastan" bajo el overlay negro y el usuario las ve. ── */
+body.is-built .hero-eyebrow    { animation: fadeUp 0.8s ease 0.20s forwards; }
+body.is-built .hero-name       { animation: fadeUp 0.8s ease 0.40s forwards; }
+body.is-built .hero-role       { animation: fadeUp 0.8s ease 0.55s forwards; }
+body.is-built .hero-desc       { animation: fadeUp 0.8s ease 0.70s forwards; }
+body.is-built .hero-ctas       { animation: fadeUp 0.8s ease 0.85s forwards; }
+body.is-built .hero-photo-wrap { animation: fadeUp 0.9s ease 0.90s forwards; }
 
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(20px); }

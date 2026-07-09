@@ -106,7 +106,7 @@
         "tags": ["Astro", "TypeScript", "IA"]
       },
       "ruletasorteos": {
-        "title": "RuletaSorteos.es",
+        "title": "Ruleta y Sorteos",
         "desc": "Herramienta de sorteos y ruleta online gratuita con ruleta clásica, ruleta casino, sistema Provably Fair y hasta 500 participantes. 100% local, sin servidor.",
         "tags": ["Astro", "TypeScript", "Canvas"]
       }
