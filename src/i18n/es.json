@@ -46,7 +46,7 @@
         "label": "Años de experiencia"
       },
       "projects": {
-        "num": "+4",
+        "num": "+5",
         "label": "Proyectos completados"
       },
       "lighthouse": {
@@ -115,6 +115,11 @@
         "title": "Gana Dinero Web",
         "desc": "Landing para monetización y captura de leads. Rápido, responsive y orientado a la conversión.",
         "tags": ["Web", "Landing", "Monetización"]
+      },
+      "defiendelabase": {
+        "title": "Defiende la Base",
+        "desc": "Experiencia web de estrategia y defensa en la que cada decisión cuenta. Una propuesta interactiva, directa y optimizada para jugar desde el navegador.",
+        "tags": ["Web", "Juego", "Interactivo"]
       }
     },
     "viewProject": "Ver proyecto: "

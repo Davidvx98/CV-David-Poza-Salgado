@@ -105,7 +105,7 @@ const websiteSchema = JSON.stringify({
     <script type="application/ld+json" set:html={personSchema} />
     <script type="application/ld+json" set:html={websiteSchema} />
 
-    <!-- ─── Prevent flash of wrong theme ─── -->
+    <!-- ─── Apply the saved theme before first paint ─── -->
     <script is:inline>
       (function () {
         var saved = localStorage.getItem('theme');

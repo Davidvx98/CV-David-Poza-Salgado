@@ -135,15 +135,21 @@ body {
   position: relative;
   width: 340px;
   height: 220px;
-  perspective: 1400px;
-  perspective-origin: 50% 15%;
+  cursor: pointer;
+  outline: none;
+}
+
+.envelope-wrap:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 10px;
 }
 
 /*
   Z-index dentro del envelope-wrap (stacking local):
-  2 → envelope-body (panel sólido, contiene los pliegues laterales/inferior)
-  6 → envelope-letter (carta que asoma por dentro del sobre)
-  8 → envelope-flap (solapa 3D, bisagra real con rotateX)
+  2 → envelope-body (panel sólido trasero)
+  4 → envelope-letter (carta dentro del bolsillo)
+  5/6 → pliegues frontales del bolsillo
+  8 → envelope-flap cerrada; 3 cuando queda abierta detrás
 
   Fuera del envelope-wrap, dentro del overlay:
   9200 → .envelope-seal (por encima de todo el sobre)
@@ -155,23 +161,18 @@ body {
 
 /*
   ══════════════════════════════════════════════════════
-  SOBRE (ENVELOPE) — geometría 3D real con transform-style
+  SOBRE (ENVELOPE) — geometría 2D de piezas superpuestas
   ══════════════════════════════════════════════════════
 
   Estructura de un sobre real (de atrás a adelante):
     1. Cuerpo blanco (rectángulo base) + pliegues laterales/inferior
     2. Carta: rectángulo que asoma y sube por detrás de la solapa
-    3. Solapa: bisagra real en el borde superior (rotateX 3D),
-       gira hacia atrás -180° revelando el interior al abrir
+    3. Solapa: triángulo con bisagra en el borde superior,
+       se repliega y eleva hacia arriba para revelar el interior
 
   Colores: blanco y grises para máximo contraste sobre fondo oscuro
   ══════════════════════════════════════════════════════
 */
-
-.envelope-wrap,
-.envelope-wrap * {
-  transform-style: preserve-3d;
-}
 
 /* ── 1. Cuerpo base ─────────────────────────────────── */
 .envelope-body {
@@ -192,7 +193,7 @@ body {
 .env-fold-bottom {
   position: absolute;
   inset: 0;
-  z-index: 3;
+  z-index: 5;
   pointer-events: none;
   /* Triángulo: esquina bottom-left, bottom-right, pico en el centro */
   clip-path: polygon(0% 100%, 100% 100%, 50% 50%);
@@ -203,7 +204,7 @@ body {
 .env-fold-left {
   position: absolute;
   inset: 0;
-  z-index: 4;
+  z-index: 6;
   pointer-events: none;
   /* Triángulo: esquina top-left, bottom-left, pico en el centro */
   clip-path: polygon(0% 0%, 0% 100%, 50% 50%);
@@ -213,7 +214,7 @@ body {
 .env-fold-right {
   position: absolute;
   inset: 0;
-  z-index: 4;
+  z-index: 6;
   pointer-events: none;
   /* Triángulo: esquina top-right, bottom-right, pico en el centro */
   clip-path: polygon(100% 0%, 100% 100%, 50% 50%);
@@ -223,15 +224,14 @@ body {
 /* ── 4. Interior de la solapa (oculto — ya no necesario) ── */
 .env-fold-top { display: none; }
 
-/* ── 5. Solapa (z:8) — bisagra 3D real, gira hacia atrás ── */
+/* ── 5. Solapa (z:8) — triángulo 2D que se eleva desde la bisagra ── */
 .envelope-flap {
   position: absolute;
   top: -1px; left: -1px; right: -1px;
   height: 112px;
   z-index: 8;
   transform-origin: 50% 0%;
-  transform: rotateX(0deg);
-  transition: transform 0.75s cubic-bezier(0.65, 0, 0.35, 1);
+  transform: scaleY(1);
   will-change: transform;
 }
 
@@ -244,34 +244,10 @@ body {
   border-left:  2px solid #111111;
   border-right: 2px solid #111111;
   border-top:   2px solid #111111;
-  backface-visibility: hidden;
   box-shadow: 0 2px 10px rgba(0,0,0,0.25);
 }
 
-/* Cara trasera de la solapa: se ve al girar más allá de 90° */
-.envelope-flap-back {
-  position: absolute;
-  inset: 0;
-  background: #d4d4d4;
-  clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
-  border-left:  1.5px solid #111111;
-  border-right: 1.5px solid #111111;
-  border-top:   1.5px solid #111111;
-  transform: rotateX(180deg);
-  backface-visibility: hidden;
-}
-
-/* Al abrir: la solapa gira -175° sobre su bisagra superior, como un sobre real */
-.envelope-wrap.open .envelope-flap {
-  transform: rotateX(-175deg);
-}
-
-.envelope-wrap.open .envelope-body {
-  box-shadow:
-    0 0 70px rgba(232,212,77,0.3),
-    0 24px 60px rgba(0,0,0,0.9);
-}
-
+/* GSAP invierte la escala vertical y la reordena detrás al abrirse. */
 /* ── 6. Carta: asoma sutilmente por dentro del sobre tras la solapa ── */
 .envelope-letter {
   position: absolute;
@@ -283,18 +259,10 @@ body {
   background: linear-gradient(180deg, #fdfdfd 0%, #f2f2f2 100%);
   border: 1.5px solid #111111;
   border-radius: 2px;
-  z-index: 6;
+  z-index: 4;
   opacity: 0;
   box-shadow: 0 -4px 18px rgba(0,0,0,0.15);
-  transition:
-    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1),
-    opacity   0.3s ease;
-}
-
-.envelope-wrap.open .envelope-letter {
-  opacity: 1;
-  transition-delay: 0.45s, 0.45s;
-  transform: translateX(-50%) translateY(-22%);
+  will-change: transform, opacity;
 }
 
 /* ── Sello de lacre sobre el sobre ──────────────────────── */
@@ -305,32 +273,7 @@ body {
   transform: translate(-50%, -50%);
   z-index: 20;
   cursor: pointer;
-  /* Pulso suave mientras espera el click */
-  animation: seal-pulse 2.4s ease-in-out infinite;
-  transition: transform 0.18s ease, opacity 0.18s ease;
-  will-change: transform, opacity;
-}
-
-.envelope-seal:hover {
-  animation: none;
-  transform: translate(-50%, -50%) scale(1.06);
-  filter: drop-shadow(0 0 10px var(--accent));
-}
-
-/* Al hacer click: el sello explota y desaparece */
-.envelope-seal.seal-break {
-  animation: seal-break 0.45s ease-out forwards !important;
-}
-
-@keyframes seal-pulse {
-  0%,100% { transform: translate(-50%, -50%) scale(1);    filter: drop-shadow(0 0 6px  var(--accent-glow)); }
-  50%     { transform: translate(-50%, -50%) scale(1.04); filter: drop-shadow(0 0 14px var(--accent-glow)); }
-}
-
-@keyframes seal-break {
-  0%   { transform: translate(-50%, -50%) scale(1);    opacity: 1; }
-  40%  { transform: translate(-50%, -50%) scale(1.35); opacity: 0.7; }
-  100% { transform: translate(-50%, -50%) scale(0.2);  opacity: 0; }
+  filter: drop-shadow(0 0 8px var(--accent-glow));
 }
 
 /* ── Tarjeta: position:fixed, sube desde el sobre al centro ── */
@@ -409,23 +352,12 @@ body {
   50% { opacity: 0.9; }
 }
 
-/* ─── Flash de transición — gestionado íntegramente por GSAP ── */
-/* No hay animation CSS aquí: GSAP inyecta radial-gradient y anima
-   opacity + scale en EnvelopeIntro.astro → enterPortfolio()        */
-#lightning-flash {
-  position: fixed;
-  inset: 0;
-  z-index: 9500;
-  pointer-events: none;
-  opacity: 0;
-  will-change: opacity, transform;
-}
-
 /* ─── Skip Button ─────────────────────────────────────── */
 .skip-btn {
-  position: absolute;
-  bottom: -60px;
+  position: fixed;
+  bottom: 24px;
   left: 50%;
+  z-index: 9200;
   transform: translateX(-50%);
   font-size: 0.66rem;
   letter-spacing: 0.14em;
@@ -578,7 +510,7 @@ html.light .site-header {
   color: #09090f;
 }
 
-/* ─── ON/OFF Toggle (animaciones + flash) ────────────── */
+/* ─── ON/OFF Toggle de la animación de entrada ────────────── */
 .anim-toggle-wrap {
   display: flex;
   align-items: center;
@@ -646,35 +578,6 @@ html.light .site-header {
 
 .anim-btn.active {
   color: var(--accent);
-}
-
-/* ─── Advertencia fotosensibilidad (en la carta) ──────── */
-.epilepsy-warning {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  width: 100%;
-  box-sizing: border-box;
-  background: color-mix(in srgb, var(--accent) 5%, transparent);
-  border: 1px solid var(--border-accent);
-  border-radius: 6px;
-  padding: 10px 12px;
-  margin-bottom: 16px;
-}
-
-.epilepsy-warning > svg {
-  color: var(--accent);
-  flex-shrink: 0;
-  opacity: 0.85;
-}
-
-.epilepsy-warning > p {
-  font-size: 0.61rem !important;
-  line-height: 1.55 !important;
-  color: var(--text-muted) !important;
-  margin-bottom: 0 !important;
-  text-align: center;
 }
 
 /* ─── Theme toggle ────────────────────────────────────── */

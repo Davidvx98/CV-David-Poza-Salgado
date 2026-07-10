@@ -46,7 +46,7 @@
         "label": "Years of experience"
       },
       "projects": {
-        "num": "+4",
+        "num": "+5",
         "label": "Completed projects"
       },
       "lighthouse": {
@@ -115,6 +115,11 @@
         "title": "Gana Dinero Web",
         "desc": "Landing focused on monetization and lead capture. Fast, responsive and conversion-oriented.",
         "tags": ["Web", "Landing", "Monetization"]
+      },
+      "defiendelabase": {
+        "title": "Defiende la Base",
+        "desc": "A strategy and base-defence web experience where every decision matters. An immediate, interactive game optimized for the browser.",
+        "tags": ["Web", "Game", "Interactive"]
       }
     },
     "viewProject": "View project: "
